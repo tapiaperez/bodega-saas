@@ -1,0 +1,31 @@
+<!-- src/main/resources/templates/admin_pedidos.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Pedidos</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="container">
+
+    <h2>📦 Pedidos Web</h2>
+
+    <table class="tabla">
+        <tr>
+            <th>ID</th>
+            <th>Total</th>
+            <th>Estado</th>
+        </tr>
+
+        <tr th:each="p : ${pedidos}">
+            <td th:text="${p.idPedido}"></td>
+            <td th:text="${p.total}"></td>
+            <td th:text="${p.estado}"></td>
+        </tr>
+    </table>
+
+</div>
+
+</body>
+</html>

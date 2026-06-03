@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Pedido Exitoso</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<div class="container" style="text-align:center; margin-top:100px;">
+
+    <div style="background:white; padding:40px; border-radius:10px; box-shadow:0 3px 15px rgba(0,0,0,0.2); display:inline-block;">
+
+        <h1 style="color:green;">✔ Pedido registrado</h1>
+
+        <p>Tu pedido fue enviado correctamente.</p>
+
+        <br>
+
+        <a th:href="@{'/tienda/' + ${idEmpresa}}" class="btn">
+            Volver al catálogo
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <h1>🏪 Bodega Express</h1>
+
+    <div class="nav">
+        <a href="/tienda/1">Catálogo</a>
+        <a href="/admin/pedidos">Pedidos</a>
+        <a href="/logout">Salir</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- BIENVENIDA -->
+    <h2>Bienvenido, Administrador</h2>
+
+    <div style="background:#e3f2fd; padding:15px; border-radius:8px; margin-bottom:20px;">
+        Estás gestionando: <b>Bodega Don Pepe</b>
+    </div>
+
+    <!-- TARJETAS -->
+    <div style="display:flex; gap:20px; flex-wrap:wrap;">
+
+        <!-- TIENDA PUBLICA -->
+        <div style="flex:1; min-width:300px; background:white; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+
+            <div style="background:#2e7d32; color:white; padding:10px; border-radius:10px 10px 0 0;">
+                🌐 Tu Tienda Pública
+            </div>
+
+            <div style="padding:15px;">
+                <p>Comparte este enlace con tus clientes:</p>
+
+                <input type="text"
+                       th:value="'http://localhost:8080/tienda/' + ${idEmpresa}"
+                       style="width:100%; padding:8px; margin-bottom:10px;">
+
+                <a th:href="'/tienda/' + ${idEmpresa}" target="_blank" class="btn">
+                    Probar Tienda
+                </a>
+            </div>
+        </div>
+
+        <!-- PEDIDOS -->
+        <div style="flex:1; min-width:300px; background:white; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+
+            <div style="background:#fbc02d; color:black; padding:10px; border-radius:10px 10px 0 0;">
+                📦 Pedidos Web
+            </div>
+
+            <div style="padding:15px;">
+                <p>Gestiona los pedidos realizados por tus clientes</p>
+
+                <a href="/admin/pedidos" class="btn">
+                    Ver Pedidos
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

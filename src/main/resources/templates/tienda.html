@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Bodega</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <h1>🏪 Bodega Don Pepe</h1>
+
+    <div class="nav">
+        <a href="/carrito">🛒 Carrito</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <h2 class="titulo-seccion">Catálogo</h2>
+
+    <div class="catalogo">
+
+        <div class="producto-card" th:each="p : ${productos}">
+
+
+
+            <!-- IMAGEN -->
+            <div class="producto-img">
+                <span th:text="${p.nombre}"></span>
+            </div>
+
+            <!-- BODY -->
+            <div class="producto-body">
+
+                <h3 th:text="${p.nombre}"></h3>
+
+                <p th:text="${p.descripcion}"></p>
+
+                <!-- PRECIO -->
+                <div class="precio">
+                    S/ <span th:text="${p.precioVenta}"></span>
+                </div>
+
+                <!-- FORM -->
+                <form action="/carrito/agregar" method="post">
+
+                    <input type="hidden" name="idProducto" th:value="${p.idProducto}">
+                    <input type="hidden" name="idEmpresa" th:value="${idEmpresa}">
+
+                    <div class="acciones">
+                        <input type="number" name="cantidad" value="1" min="1">
+                        <button class="btn-agregar">+ Agregar</button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<a href="/carrito" class="carrito-float">
+    🛒
+    <span class="badge" th:text="${cantidadCarrito}">0</span>
+</a>
+</body>
+</html>

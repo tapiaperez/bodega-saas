@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body style="display:flex; justify-content:center; align-items:center; height:100vh;">
+
+<div style="background:white; padding:30px; border-radius:10px; width:300px; box-shadow:0 0 10px rgba(0,0,0,0.2);">
+
+    <h2 style="text-align:center;">Bodega Express</h2>
+
+    <form action="/login" method="post">
+
+        <input type="text" name="email" placeholder="Correo"
+               style="width:100%; padding:10px; margin-bottom:10px;">
+
+        <input type="password" name="password" placeholder="Clave"
+               style="width:100%; padding:10px; margin-bottom:10px;">
+
+        <button class="btn" style="width:100%;">Ingresar</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>
