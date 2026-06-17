@@ -2,6 +2,7 @@ package com.bodega.saas.producto.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import com.bodega.saas.categoria.model.Categoria;
 
 @Entity
 @Table(name = "productos")
@@ -13,6 +14,9 @@ public class Producto {
 
     @Column(name = "id_empresa")
     private Long idEmpresa;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_categoria")
+    private Categoria categoria;
 
     private String nombre;
     private String descripcion;
@@ -22,6 +26,9 @@ public class Producto {
 
     @Column(name = "stock_actual")
     private Integer stockActual;
+
+    @Column(name = "imagen_url")
+    private String imagenUrl;
 
     // GETTERS Y SETTERS
 
@@ -71,5 +78,20 @@ public class Producto {
 
     public void setStockActual(Integer stockActual) {
         this.stockActual = stockActual;
+    }
+    public Categoria getCategoria() {
+    return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
+    }
+
+    public String getImagenUrl() {
+    return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 }

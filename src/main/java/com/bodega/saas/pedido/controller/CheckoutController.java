@@ -27,7 +27,14 @@ public class CheckoutController {
     @Autowired
     private ProductoRepository productoRepository; 
     @PostMapping("/checkout")
-    public String procesar(HttpSession session) {
+    public String procesar(
+
+            @RequestParam String nombreContacto,
+            @RequestParam String telefonoContacto,
+            @RequestParam(required = false) String direccionEnvio,
+            @RequestParam String tipoEntrega,
+
+            HttpSession session) {
 
         Object obj = session.getAttribute("carrito");
 
@@ -44,6 +51,18 @@ public class CheckoutController {
         pedido.setIdEmpresa(idEmpresa);
         pedido.setEstado("PENDIENTE");
 
+        pedido.setNombreContacto(nombreContacto);
+
+        pedido.setTelefonoContacto(telefonoContacto);
+
+        if ("RECOJO".equals(tipoEntrega)) {
+
+            pedido.setDireccionEnvio("RECOJO EN TIENDA");
+
+        } else {
+
+            pedido.setDireccionEnvio(direccionEnvio);
+        }   
         pedidoRepository.save(pedido);
 
         BigDecimal total = BigDecimal.ZERO;

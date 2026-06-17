@@ -13,35 +13,209 @@
 
 <div class="container">
 
-    <table class="tabla">
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Precio</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
+    <!-- CARRITO CON PRODUCTOS -->
+    <div th:if="${not #lists.isEmpty(carrito)}">
 
-        <tbody>
-            <tr th:each="item : ${carrito}">
-                <td th:text="${item.nombre}"></td>
-                <td th:text="${item.cantidad}"></td>
-                <td>S/ <span th:text="${item.precio}"></span></td>
-                <td>S/ <span th:text="${item.subtotal}"></span></td>
-            </tr>
-        </tbody>
-    </table>
+        <!-- TABLA -->
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Subtotal</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
 
-    <div style="margin-top:20px; text-align:right;">
-        <h2>Total: S/ <span th:text="${total}"></span></h2>
+            <tbody>
+                <tr th:each="item : ${carrito}">
+                    <td th:text="${item.nombre}"></td>
+
+                    <td>
+                        <form action="/carrito/actualizar"
+                              method="post"
+                              class="form-cantidad">
+
+                            <input type="hidden"
+                                   name="idProducto"
+                                   th:value="${item.idProducto}">
+
+                            <input type="number"
+                                   name="cantidad"
+                                   min="1"
+                                   th:value="${item.cantidad}"
+                                   class="input-cantidad">
+
+                        </form>
+                    </td>
+
+                    <td>
+                        S/ <span th:text="${item.precio}"></span>
+                    </td>
+
+                    <td>
+                        S/ <span th:text="${item.subtotal}"></span>
+                    </td>
+
+                    <td>
+                        <form action="/carrito/eliminar"
+                              method="post">
+
+                            <input type="hidden"
+                                   name="idProducto"
+                                   th:value="${item.idProducto}">
+
+                            <button type="submit">❌</button>
+
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- ACCIONES -->
+        <div class="acciones-carrito">
+
+            <a th:href="@{/tienda/{id}(id=${session.idEmpresa})}"
+               class="btn btn-secundario">
+                ← Seguir comprando
+            </a>
+
+            <form action="/carrito/vaciar" method="post">
+                <button type="submit"
+                        class="btn btn-peligro">
+                    🗑 Vaciar carrito
+                </button>
+            </form>
+
+        </div>
+
+        <!-- CHECKOUT -->
+        <div class="checkout-box">
+
+            <form action="/checkout" method="post">
+
+                <div class="datos-entrega">
+
+                    <h3>Datos de entrega</h3>
+
+                    <label>Nombre *</label>
+                    <input type="text"
+                           name="nombreContacto"
+                           required>
+
+                    <label>Teléfono *</label>
+                    <input type="text"
+                           name="telefonoContacto"
+                           required>
+
+                    <label>Tipo de entrega</label>
+
+                    <select name="tipoEntrega"
+                            id="tipoEntrega">
+
+                        <option value="DELIVERY">
+                            Delivery
+                        </option>
+
+                        <option value="RECOJO">
+                            Recojo en tienda
+                        </option>
+
+                    </select>
+
+                    <div id="bloqueDireccion">
+
+                        <label>Dirección</label>
+
+                        <input type="text"
+                               name="direccionEnvio">
+
+                    </div>
+
+                </div>
+
+                <div class="resumen-carrito">
+                    <h2>
+                        Total: S/
+                        <span th:text="${total}"></span>
+                    </h2>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-principal">
+                    ✅ Confirmar Pedido
+                </button>
+
+            </form>
+
+        </div>
+
     </div>
 
-    <form action="/checkout" method="post">
-        <button class="btn">Confirmar Pedido</button>
-    </form>
+    <!-- CARRITO VACÍO -->
+    <div th:if="${#lists.isEmpty(carrito)}"
+         class="carrito-vacio">
+
+        <h2>🛒 Tu carrito está vacío</h2>
+
+        <br>
+
+        <a th:href="@{/tienda/{id}(id=${session.idEmpresa})}"
+           class="btn btn-secundario">
+
+            ← Seguir comprando
+
+        </a>
+
+    </div>
 
 </div>
+
+<script>
+
+document.querySelectorAll('.input-cantidad').forEach(input => {
+
+    let timer;
+
+    input.addEventListener('input', function() {
+
+        clearTimeout(timer);
+
+        timer = setTimeout(() => {
+            this.closest('form').submit();
+        }, 1000);
+
+    });
+
+});
+
+function toggleDireccion() {
+
+    const tipo =
+        document.getElementById("tipoEntrega");
+
+    if (!tipo) return;
+
+    const bloque =
+        document.getElementById("bloqueDireccion");
+
+    if (tipo.value === "RECOJO") {
+
+        bloque.style.display = "none";
+
+    } else {
+
+        bloque.style.display = "block";
+
+    }
+
+}
+
+window.onload = toggleDireccion;
+
+</script>
 
 </body>
 </html>
