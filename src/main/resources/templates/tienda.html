@@ -12,14 +12,31 @@
     <h1>🏪 Bodega Don Pepe</h1>
 
     <div class="nav">
-        <a href="/carrito">🛒 Carrito</a>
+        <a href="/carrito">
+            🛒 Carrito
+            (<span th:text="${cantidadCarrito}">0</span>)
+        </a>
     </div>
 </div>
 
 <div class="container">
 
     <h2 class="titulo-seccion">Catálogo</h2>
+    <div class="filtros-categorias">
 
+        <a th:href="@{/tienda/{id}(id=${idEmpresa})}"
+        class="btn-categoria">
+            Todas
+        </a>
+
+        <a th:each="cat : ${categorias}"
+        th:href="@{/tienda/{id}(id=${idEmpresa},categoria=${cat.idCategoria})}"
+        class="btn-categoria"
+        th:classappend="${categoriaSeleccionada == cat.idCategoria} ? ' categoria-activa' : ''"
+        th:text="${cat.nombre}">
+        </a>
+
+    </div>
     <div class="catalogo">
 
         <div class="producto-card" th:each="p : ${productos}">
@@ -28,13 +45,22 @@
 
             <!-- IMAGEN -->
             <div class="producto-img">
-                <span th:text="${p.nombre}"></span>
+
+                <img th:src="${p.imagenUrl != null ? p.imagenUrl : '/img/productos/default.png'}"
+                    th:alt="${p.nombre}"
+                    class="img-producto">
+
             </div>
 
             <!-- BODY -->
             <div class="producto-body">
 
                 <h3 th:text="${p.nombre}"></h3>
+                <div class="categoria-producto">
+                    <span th:if="${p.categoria != null}"
+                        th:text="${p.categoria.nombre}">
+                    </span>
+                </div>
 
                 <p th:text="${p.descripcion}"></p>
 
@@ -42,6 +68,17 @@
                 <div class="precio">
                     S/ <span th:text="${p.precioVenta}"></span>
                 </div>
+
+                <!-- STOCK -->
+                <div class="stock-disponible">
+                    Stock: <span th:text="${p.stockActual}"></span>
+                </div>
+
+                <div th:if="${p.stockActual <= 10}"
+                    class="stock-bajo">
+                    ⚠ Últimas unidades
+                </div>
+
 
                 <!-- FORM -->
                 <form action="/carrito/agregar" method="post">

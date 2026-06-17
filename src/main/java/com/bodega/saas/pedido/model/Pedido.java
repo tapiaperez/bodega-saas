@@ -43,4 +43,8 @@ public class Pedido {
 
     public String getDireccionEnvio() { return direccionEnvio; }
     public void setDireccionEnvio(String direccionEnvio) { this.direccionEnvio = direccionEnvio; }
+
+    public LocalDateTime getFechaPedido() { return fechaPedido; }
+
+    public void setFechaPedido(LocalDateTime fechaPedido) { this.fechaPedido = fechaPedido;  }
 }
