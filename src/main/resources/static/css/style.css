@@ -748,3 +748,15 @@ cursor:pointer;
     border-radius:6px;
     margin-bottom:15px;
 }
+
+@media print {
+
+    body{
+        background:white;
+    }
+
+    .acciones-ticket{
+        display:none;
+    }
+
+}

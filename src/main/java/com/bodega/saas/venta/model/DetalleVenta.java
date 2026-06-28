@@ -23,6 +23,8 @@ public class DetalleVenta {
     @Column(name = "precio_unitario")
     private BigDecimal precioUnitario;
 
+
+
     private BigDecimal subtotal;
 
     // ===== GETTERS Y SETTERS =====
@@ -46,6 +48,8 @@ public class DetalleVenta {
     public Long getIdProducto() {
         return idProducto;
     }
+
+    
 
     public void setIdProducto(Long idProducto) {
         this.idProducto = idProducto;
@@ -74,4 +78,6 @@ public class DetalleVenta {
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
     }
+
+    
 }

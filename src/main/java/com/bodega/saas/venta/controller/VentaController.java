@@ -18,10 +18,11 @@ import jakarta.servlet.http.HttpSession;
 
 import com.bodega.saas.producto.model.Producto;
 import com.bodega.saas.venta.dto.VentaItem;
+import com.bodega.saas.venta.model.Venta;
 import com.bodega.saas.venta.service.VentaService;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.bodega.saas.venta.service.VentaService;
+
 
 @Controller
 public class VentaController {
@@ -141,48 +142,46 @@ public class VentaController {
     }
 
         @PostMapping("/admin/ventas/registrar")
-        public String registrarVenta(HttpSession session,
-                                    RedirectAttributes redirectAttributes) {
+            public String registrarVenta(HttpSession session,
+                                        RedirectAttributes redirectAttributes) {
 
-            List<VentaItem> venta =
-                    (List<VentaItem>) session.getAttribute("venta");
+                List<VentaItem> venta =
+                        (List<VentaItem>) session.getAttribute("venta");
 
-            if (venta == null || venta.isEmpty()) {
+                if (venta == null || venta.isEmpty()) {
 
-                redirectAttributes.addFlashAttribute(
-                        "error",
-                        "No existen productos para registrar.");
+                    redirectAttributes.addFlashAttribute(
+                            "error",
+                            "No existen productos para registrar.");
 
-                return "redirect:/admin/ventas";
+                    return "redirect:/admin/ventas";
+
+                }
+
+                try {
+
+                    Venta ventaRegistrada =
+                            ventaService.generarVentaPOS(
+                                    1L,
+                                    1L,
+                                    venta);
+
+                    session.removeAttribute("venta");
+
+                    return "redirect:/admin/ventas/ticket/"
+                            + ventaRegistrada.getIdVenta();
+
+                } catch (RuntimeException ex) {
+
+                    redirectAttributes.addFlashAttribute(
+                            "error",
+                            ex.getMessage());
+
+                    return "redirect:/admin/ventas";
+
+                }
 
             }
-
-            try {
-
-                // Por ahora usamos valores fijos igual que en Pedidos
-                ventaService.generarVentaPOS(
-                        1L,   // idEmpresa
-                        1L,   // idUsuario
-                        venta);
-
-                // Limpiar la venta temporal
-                session.removeAttribute("venta");
-
-                redirectAttributes.addFlashAttribute(
-                        "success",
-                        "Venta registrada correctamente.");
-
-            } catch (RuntimeException ex) {
-
-                redirectAttributes.addFlashAttribute(
-                        "error",
-                        ex.getMessage());
-
-            }
-
-            return "redirect:/admin/ventas";
-
-        }
 
         @PostMapping("/admin/ventas/eliminar")
             public String eliminarProductoVenta(
