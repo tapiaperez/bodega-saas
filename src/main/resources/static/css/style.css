@@ -760,3 +760,151 @@ cursor:pointer;
     }
 
 }
+
+
+
+/*==========================
+ DASHBOARD REPORTES
+==========================*/
+
+.dashboard-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+
+    gap:25px;
+
+    margin-top:30px;
+
+}
+
+.dashboard-card{
+
+    background:#fff;
+
+    border-radius:12px;
+
+    padding:25px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+}
+
+.dashboard-card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+.dashboard-icon{
+
+    width:70px;
+
+    height:70px;
+
+    border-radius:50%;
+
+    background:#e9f3ff;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:34px;
+
+}
+
+.dashboard-info h3{
+
+    margin:0;
+
+    color:#666;
+
+    font-size:18px;
+
+}
+
+.dashboard-number{
+
+    font-size:34px;
+
+    font-weight:bold;
+
+    color:#0d6efd;
+
+}
+
+/*==========================
+ TABLA REPORTES
+==========================*/
+
+.tabla-reportes{
+
+    width:100%;
+
+    margin-top:30px;
+
+    border-collapse:collapse;
+
+    background:#fff;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+
+}
+
+.tabla-reportes th{
+
+    background:#0d6efd;
+
+    color:white;
+
+    padding:15px;
+
+    text-align:left;
+
+}
+
+.tabla-reportes td{
+
+    padding:14px;
+
+    border-bottom:1px solid #ececec;
+
+}
+
+.tabla-reportes tr:hover{
+
+    background:#f7fbff;
+
+}
+
+.btn-ver{
+
+    background:#198754;
+
+    color:white;
+
+    padding:8px 15px;
+
+    border-radius:6px;
+
+    text-decoration:none;
+
+    font-weight:bold;
+
+}
