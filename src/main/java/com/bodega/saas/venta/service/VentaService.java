@@ -17,7 +17,7 @@ import java.util.List;
 import com.bodega.saas.pedido.model.DetallePedido;
 import com.bodega.saas.producto.model.Producto;
 import com.bodega.saas.venta.model.DetalleVenta;
-
+import com.bodega.saas.venta.dto.VentaItem;
 
 @Service
 public class VentaService {
@@ -36,6 +36,8 @@ public class VentaService {
 
     @Autowired
     private ProductoRepository productoRepository;
+
+    
 
     @Transactional
     
@@ -113,39 +115,123 @@ public class VentaService {
         @Transactional
         public void reservarStock(Long idPedido) {
 
-    List<DetallePedido> detalles =
-            detallePedidoRepository.findByIdPedido(idPedido);
+        List<DetallePedido> detalles =
+                detallePedidoRepository.findByIdPedido(idPedido);
 
-    for (DetallePedido dp : detalles) {
+        for (DetallePedido dp : detalles) {
 
-        Producto producto = productoRepository
-                .findById(dp.getIdProducto())
-                .orElse(null);
+            Producto producto = productoRepository
+                    .findById(dp.getIdProducto())
+                    .orElse(null);
 
-        if (producto == null) {
-            continue;
+            if (producto == null) {
+                continue;
+            }
+
+            // Validar stock disponible
+            if (producto.getStockActual() < dp.getCantidad()) {
+
+                throw new RuntimeException(
+                        "Stock insuficiente para el producto: "
+                        + producto.getNombre());
+
+            }
+
+            // Reservar stock
+            int nuevoStock =
+                    producto.getStockActual() - dp.getCantidad();
+
+            producto.setStockActual(nuevoStock);
+
+            productoRepository.save(producto);
+
         }
-
-        // Validar stock disponible
-        if (producto.getStockActual() < dp.getCantidad()) {
-
-            throw new RuntimeException(
-                    "Stock insuficiente para el producto: "
-                    + producto.getNombre());
-
-        }
-
-        // Reservar stock
-        int nuevoStock =
-                producto.getStockActual() - dp.getCantidad();
-
-        producto.setStockActual(nuevoStock);
-
-        productoRepository.save(producto);
 
     }
 
-}
+
+    @Transactional
+    public Venta generarVentaPOS(Long idEmpresa,
+                                Long idUsuario,
+                                List<VentaItem> items) {
+
+        Venta venta = new Venta();
+
+        venta.setIdEmpresa(idEmpresa);
+
+        venta.setIdUsuario(idUsuario);
+
+        venta.setTipoComprobante("TICKET");
+
+        String serie = obtenerSerie("TICKET");
+
+        Integer ultimo =
+                ventaRepository.obtenerUltimoCorrelativo(serie);
+
+        venta.setSerie(serie);
+
+        venta.setCorrelativo(ultimo + 1);
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (VentaItem item : items) {
+
+            total = total.add(item.getSubtotal());
+
+        }
+
+        venta.setSubtotal(total);
+
+        venta.setIgv(BigDecimal.ZERO);
+
+        venta.setTotal(total);
+
+        venta.setEstado("REGISTRADA");
+
+        venta.setOrigen("POS");
+
+        ventaRepository.save(venta);
+
+        for (VentaItem item : items) {
+
+            DetalleVenta dv = new DetalleVenta();
+
+            dv.setIdVenta(venta.getIdVenta());
+
+            dv.setIdProducto(item.getIdProducto());
+
+            dv.setCantidad(item.getCantidad());
+
+            dv.setPrecioUnitario(item.getPrecio());
+
+            dv.setSubtotal(item.getSubtotal());
+
+            detalleVentaRepository.save(dv);
+
+            Producto producto =
+                    productoRepository.findById(item.getIdProducto())
+                            .orElseThrow();
+
+            if (producto.getStockActual() < item.getCantidad()) {
+
+                throw new RuntimeException(
+                        "Stock insuficiente para " +
+                        producto.getNombre());
+
+            }
+
+            producto.setStockActual(
+                    producto.getStockActual() -
+                    item.getCantidad());
+
+            productoRepository.save(producto);
+
+        }
+
+        return venta;
+
+    }
+
 
     private String obtenerSerie(String tipoComprobante) {
 
