@@ -4,6 +4,7 @@
 <head>
     <title>Pedidos</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    
 </head>
 <body>
 
@@ -90,6 +91,17 @@
     </table>
 
 </div>
+<<script>
 
+setInterval(function () {
+
+    if (!document.hidden) {
+        window.location.reload();
+    }
+
+}, 10000);
+
+</script>
+</script>
 </body>
 </html>

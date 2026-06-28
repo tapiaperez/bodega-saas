@@ -70,14 +70,29 @@
                 </div>
 
                 <!-- STOCK -->
-                <div class="stock-disponible">
-                    Stock: <span th:text="${p.stockActual}"></span>
-                </div>
+                    <div th:if="${p.stockActual > 5}" class="stock-disponible">
 
-                <div th:if="${p.stockActual <= 10}"
-                    class="stock-bajo">
-                    ⚠ Últimas unidades
-                </div>
+                        ✔ Disponible
+                        (<span th:text="${p.stockActual}"></span>)
+
+                    </div>
+
+                    <div th:if="${p.stockActual > 0 and p.stockActual <= 5}"
+                        class="stock-bajo">
+
+                        ⚠ Últimas unidades
+                        (<span th:text="${p.stockActual}"></span>)
+
+                    </div>
+
+                    <div th:if="${p.stockActual == 0}"
+                        class="stock-agotado">
+
+                        ❌ Agotado
+
+                    </div>
+
+
 
 
                 <!-- FORM -->
@@ -87,8 +102,24 @@
                     <input type="hidden" name="idEmpresa" th:value="${idEmpresa}">
 
                     <div class="acciones">
-                        <input type="number" name="cantidad" value="1" min="1">
-                        <button class="btn-agregar">+ Agregar</button>
+                        <input type="number" name="cantidad" value="1" min="1" th:attr="max=${p.stockActual}">
+                        <div th:if="${p.stockActual > 0}">
+
+                            <button class="btn-agregar">
+                                🛒 Agregar al carrito
+                            </button>
+
+                        </div>
+
+                        <div th:if="${p.stockActual == 0}">
+
+                            <button class="btn-agotado" disabled>
+
+                                AGOTADO
+
+                            </button>
+
+                        </div>
                     </div>
 
                 </form>

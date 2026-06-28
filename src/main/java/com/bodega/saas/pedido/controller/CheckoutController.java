@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class CheckoutController {
@@ -26,6 +27,7 @@ public class CheckoutController {
 
     @Autowired
     private ProductoRepository productoRepository; 
+    
     @PostMapping("/checkout")
     public String procesar(
 
@@ -34,7 +36,8 @@ public class CheckoutController {
             @RequestParam(required = false) String direccionEnvio,
             @RequestParam String tipoEntrega,
 
-            HttpSession session) {
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
 
         Object obj = session.getAttribute("carrito");
 
@@ -46,6 +49,32 @@ public class CheckoutController {
         Long idEmpresa = (Long) session.getAttribute("idEmpresa");
 
         if (carrito.isEmpty()) return "redirect:/";
+
+        // VALIDAR STOCK ANTES DE CREAR EL PEDIDO
+        for (ItemCarrito item : carrito) {
+
+            Producto producto = productoRepository
+                    .findById(item.getIdProducto())
+                    .orElse(null);
+
+            if (producto == null) {
+                return "redirect:/carrito";
+            }
+
+            if (item.getCantidad() > producto.getStockActual()) {
+
+                redirectAttributes.addFlashAttribute(
+                        "error",
+                        "⚠ El producto \"" + producto.getNombre()
+                        + "\" solo tiene "
+                        + producto.getStockActual()
+                        + " unidad(es) disponibles.");
+
+                return "redirect:/carrito";
+
+            }
+
+        }
 
         Pedido pedido = new Pedido();
         pedido.setIdEmpresa(idEmpresa);

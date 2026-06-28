@@ -5,6 +5,9 @@ import com.bodega.saas.pedido.model.Pedido;
 import com.bodega.saas.pedido.repository.DetallePedidoRepository;
 import com.bodega.saas.pedido.repository.PedidoRepository;
 import com.bodega.saas.producto.repository.ProductoRepository;
+import com.bodega.saas.venta.service.VentaService;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,6 +29,10 @@ public class AdminPedidoController {
 
     @Autowired
     private ProductoRepository productoRepository;
+
+    @Autowired
+    private VentaService ventaService;
+
 
     @GetMapping("/admin/pedidos")
     public String listar(Model model) {
@@ -105,11 +112,12 @@ public class AdminPedidoController {
         return "redirect:/admin/pedidos/" + idPedido;
     }
 
-    @PostMapping("/admin/pedidos/cambiarEstado")
+   @PostMapping("/admin/pedidos/cambiarEstado")
     public String cambiarEstado(
 
             @RequestParam Long idPedido,
-            @RequestParam String nuevoEstado) {
+            @RequestParam String nuevoEstado,
+            RedirectAttributes redirectAttributes) {
 
         Pedido pedido = pedidoRepository
                 .findById(idPedido)
@@ -119,9 +127,45 @@ public class AdminPedidoController {
             return "redirect:/admin/pedidos";
         }
 
-        pedido.setEstado(nuevoEstado);
+        try {
 
-        pedidoRepository.save(pedido);
+            switch (nuevoEstado) {
+
+                case "CONFIRMADO":
+
+                    // Validar y reservar stock
+                    ventaService.reservarStock(idPedido);
+
+                    break;
+
+                case "ENTREGADO":
+
+                    // Registrar la venta
+                    ventaService.generarVentaDesdePedido(idPedido);
+
+                    break;
+
+                default:
+                    break;
+            }
+
+            // Actualizar el estado del pedido
+            pedido.setEstado(nuevoEstado);
+
+            pedidoRepository.save(pedido);
+
+            redirectAttributes.addFlashAttribute(
+                    "success",
+                    "Pedido actualizado correctamente.");
+
+        } catch (RuntimeException ex) {
+
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    ex.getMessage());
+
+            return "redirect:/admin/pedidos/" + idPedido;
+        }
 
         return "redirect:/admin/pedidos/" + idPedido;
     }

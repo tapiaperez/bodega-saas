@@ -10,7 +10,23 @@
 <div class="header">
     <h1>🛒 Mi Carrito</h1>
 </div>
+<div th:if="${error}" class="alert alert-danger">
 
+    <span th:text="${error}"></span>
+
+</div>
+
+<div th:if="${success}" class="alert alert-success">
+
+    <span th:text="${success}"></span>
+
+</div>
+
+<div th:if="${warning}" class="alert alert-warning">
+
+    <span th:text="${warning}"></span>
+
+</div>
 <div class="container">
 
     <!-- CARRITO CON PRODUCTOS -->
