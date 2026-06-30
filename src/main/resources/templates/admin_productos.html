@@ -11,17 +11,7 @@
 
 <body>
 
-<div class="header">
-    <h1>📦 Gestión de Inventario</h1>
-
-    <div class="nav">
-        <a href="/dashboard">Dashboard</a>
-        <a href="/admin/productos">Inventario</a>
-        <a href="/admin/reportes">Reportes</a>
-        <a href="/admin/ventas">Ventas</a>
-        <a href="/logout">Salir</a>
-    </div>
-</div>
+<div th:replace="~{fragments/admin_header :: adminHeader('Gesti�n de Inventario')}"></div>
 
 <div class="container">
 

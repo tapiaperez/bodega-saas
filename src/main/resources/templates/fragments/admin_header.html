@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<div class="header" th:fragment="adminHeader(titulo)">
+    <h1 th:text="${titulo}">Bodega Express</h1>
+
+    <div class="nav">
+        <a href="/dashboard">Dashboard</a>
+
+        <a href="/admin/productos"
+           sec:authorize="hasAnyRole('ADMINISTRADOR','SUPERVISOR')">
+            Inventario
+        </a>
+
+        <a href="/admin/pedidos"
+           sec:authorize="hasAnyRole('ADMINISTRADOR','SUPERVISOR','CAJERO')">
+            Pedidos
+        </a>
+
+        <a href="/admin/ventas"
+           sec:authorize="hasAnyRole('ADMINISTRADOR','SUPERVISOR','CAJERO')">
+            Ventas
+        </a>
+
+        <a href="/admin/reportes"
+           sec:authorize="hasAnyRole('ADMINISTRADOR','SUPERVISOR')">
+            Reportes
+        </a>
+
+        <a href="/admin/empleados"
+           sec:authorize="hasRole('ADMINISTRADOR')">
+            Empleados
+        </a>
+
+        <a th:href="@{/tienda/{id}(id=${session.usuario != null ? session.usuario.idEmpresa : 1})}"
+           target="_blank">
+            Catálogo
+        </a>
+
+        <a href="/logout">Salir</a>
+    </div>
+</div>
+
+</body>
+</html>

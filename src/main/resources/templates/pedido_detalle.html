@@ -6,6 +6,7 @@
 </head>
 <body>
 
+<div th:replace="~{fragments/admin_header :: adminHeader('Detalle de Pedido')}"></div>
 
     <div th:if="${success}" class="alert alert-success">
     <span th:text="${success}"></span>

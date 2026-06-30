@@ -14,6 +14,8 @@ public class Usuario {
     private String nombreCompleto;
     private String email;
     private String passwordHash;
+    private Long idRol;
+    private Integer estado;
     private String rol;
 
     public Long getIdUsuario() { return idUsuario; }
@@ -30,6 +32,12 @@ public class Usuario {
 
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+
+    public Long getIdRol() { return idRol; }
+    public void setIdRol(Long idRol) { this.idRol = idRol; }
+
+    public Integer getEstado() { return estado; }
+    public void setEstado(Integer estado) { this.estado = estado; }
 
     public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }

@@ -11,12 +11,22 @@
 
     <h2 style="text-align:center;">Bodega Express</h2>
 
+    <div th:if="${param.error}" class="alert alert-danger">
+        Credenciales incorrectas o usuario inactivo.
+    </div>
+
+    <div th:if="${param.logout}" class="alert alert-success">
+        Sesión cerrada correctamente.
+    </div>
+
     <form action="/login" method="post">
 
         <input type="text" name="email" placeholder="Correo"
+               required
                style="width:100%; padding:10px; margin-bottom:10px;">
 
         <input type="password" name="password" placeholder="Clave"
+               required
                style="width:100%; padding:10px; margin-bottom:10px;">
 
         <button class="btn" style="width:100%;">Ingresar</button>

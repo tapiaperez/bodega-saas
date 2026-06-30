@@ -8,6 +8,8 @@
 </head>
 <body>
 
+<div th:replace="~{fragments/admin_header :: adminHeader('Pedidos Web')}"></div>
+
 <div class="container">
 
     <h2>📦 Pedidos Web</h2>
@@ -91,7 +93,8 @@
     </table>
 
 </div>
-<<script>
+
+<script>
 
 setInterval(function () {
 
@@ -101,7 +104,6 @@ setInterval(function () {
 
 }, 10000);
 
-</script>
 </script>
 </body>
 </html>

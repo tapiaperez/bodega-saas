@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Empleados</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/producto.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/admin_header :: adminHeader('Empleados')}"></div>
+
+<div class="container">
+
+    <div class="inventario-header">
+        <h2 class="titulo-seccion">Gestión de Empleados</h2>
+
+        <button type="button"
+                class="btn-principal btn-nuevo-producto"
+                onclick="abrirModalEmpleadoNuevo()">
+            Nuevo Empleado
+        </button>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success">
+        <span th:text="${success}"></span>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger">
+        <span th:text="${error}"></span>
+    </div>
+
+    <div class="tabla-contenedor">
+        <table class="tabla-reportes tabla-inventario">
+            <thead>
+            <tr>
+                <th>Empleado</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:if="${#lists.isEmpty(empleados)}">
+                <td colspan="5" class="tabla-vacia">
+                    No hay empleados registrados.
+                </td>
+            </tr>
+
+            <tr th:each="e : ${empleados}">
+                <td>
+                    <strong th:text="${e.nombreCompleto}"></strong>
+                    <br>
+                    <small>
+                        Empresa:
+                        <span th:text="${e.idEmpresa}"></span>
+                    </small>
+                </td>
+
+                <td th:text="${e.email}"></td>
+
+                <td>
+                    <span class="badge-categoria"
+                          th:each="r : ${roles}"
+                          th:if="${r.idRol == e.idRol}"
+                          th:text="${r.nombre}">
+                    </span>
+                </td>
+
+                <td>
+                    <span th:if="${e.estado == null or e.estado == 1}"
+                          class="badge-activo">
+                        ACTIVO
+                    </span>
+
+                    <span th:if="${e.estado == 0}"
+                          class="badge-inactivo">
+                        INACTIVO
+                    </span>
+                </td>
+
+                <td class="acciones-tabla">
+                    <button type="button"
+                            class="btn-editar"
+                            th:attr="
+                                data-id=${e.idUsuario},
+                                data-nombre=${e.nombreCompleto},
+                                data-email=${e.email},
+                                data-rol=${e.idRol},
+                                data-estado=${e.estado != null ? e.estado : 1}"
+                            onclick="abrirModalEmpleadoEditar(this)">
+                        Editar
+                    </button>
+
+                    <form th:if="${e.estado == null or e.estado == 1}"
+                          th:action="@{/admin/empleados/estado}"
+                          method="post">
+                        <input type="hidden" name="idUsuario" th:value="${e.idUsuario}">
+                        <input type="hidden" name="estado" value="0">
+                        <button type="submit" class="btn-eliminar-producto">
+                            Desactivar
+                        </button>
+                    </form>
+
+                    <form th:if="${e.estado == 0}"
+                          th:action="@{/admin/empleados/estado}"
+                          method="post">
+                        <input type="hidden" name="idUsuario" th:value="${e.idUsuario}">
+                        <input type="hidden" name="estado" value="1">
+                        <button type="submit" class="btn-oferta">
+                            Activar
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div id="modalEmpleado" class="modal-overlay">
+    <div class="modal-oferta">
+        <div class="modal-header modal-header-celeste">
+            <h2 id="tituloModalEmpleado">Nuevo Empleado</h2>
+
+            <button type="button"
+                    class="modal-close"
+                    onclick="cerrarModalEmpleado()">
+                ×
+            </button>
+        </div>
+
+        <form th:action="@{/admin/empleados/guardar}"
+              method="post"
+              class="modal-body">
+
+            <input type="hidden" id="idUsuario" name="idUsuario">
+
+            <div class="form-group">
+                <label>Nombre completo *</label>
+                <input type="text"
+                       id="nombreCompleto"
+                       name="nombreCompleto"
+                       maxlength="255"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>Correo *</label>
+                <input type="email"
+                       id="email"
+                       name="email"
+                       maxlength="255"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>Rol *</label>
+                <select id="idRol" name="idRol" required>
+                    <option value="">Seleccione...</option>
+                    <option th:each="r : ${roles}"
+                            th:if="${r.estado == null or r.estado == 1}"
+                            th:value="${r.idRol}"
+                            th:text="${r.nombre}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       minlength="4"
+                       placeholder="Obligatoria al crear, opcional al editar">
+            </div>
+
+            <div class="form-group">
+                <label>Estado</label>
+                <select id="estado" name="estado">
+                    <option value="1">ACTIVO</option>
+                    <option value="0">INACTIVO</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button"
+                        class="btn-secundario"
+                        onclick="cerrarModalEmpleado()">
+                    Cancelar
+                </button>
+
+                <button type="submit" class="btn-principal">
+                    Guardar Empleado
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+const modalEmpleado = document.getElementById("modalEmpleado");
+
+function abrirModalEmpleadoNuevo() {
+    document.getElementById("tituloModalEmpleado").textContent = "Nuevo Empleado";
+    document.getElementById("idUsuario").value = "";
+    document.getElementById("nombreCompleto").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("idRol").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("password").required = true;
+    document.getElementById("estado").value = "1";
+    modalEmpleado.classList.add("activo");
+}
+
+function abrirModalEmpleadoEditar(btn) {
+    document.getElementById("tituloModalEmpleado").textContent = "Editar Empleado";
+    document.getElementById("idUsuario").value = btn.dataset.id;
+    document.getElementById("nombreCompleto").value = btn.dataset.nombre || "";
+    document.getElementById("email").value = btn.dataset.email || "";
+    document.getElementById("idRol").value = btn.dataset.rol || "";
+    document.getElementById("password").value = "";
+    document.getElementById("password").required = false;
+    document.getElementById("estado").value = btn.dataset.estado || "1";
+    modalEmpleado.classList.add("activo");
+}
+
+function cerrarModalEmpleado() {
+    modalEmpleado.classList.remove("activo");
+}
+
+document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+        cerrarModalEmpleado();
+    }
+});
+
+window.addEventListener("click", function (e) {
+    if (e.target === modalEmpleado) {
+        cerrarModalEmpleado();
+    }
+});
+</script>
+
+</body>
+</html>
