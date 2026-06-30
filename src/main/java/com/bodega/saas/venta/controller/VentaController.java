@@ -123,12 +123,12 @@ public class VentaController {
 
             item.setNombre(producto.getNombre());
 
-            item.setPrecio(producto.getPrecioVenta());
+            item.setPrecio(producto.getPrecioConDescuento());
 
             item.setCantidad(cantidad);
 
             item.setSubtotal(
-                    producto.getPrecioVenta()
+                    producto.getPrecioConDescuento()
                             .multiply(BigDecimal.valueOf(cantidad)));
 
             venta.add(item);

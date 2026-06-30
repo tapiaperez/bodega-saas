@@ -65,8 +65,19 @@
                 <p th:text="${p.descripcion}"></p>
 
                 <!-- PRECIO -->
-                <div class="precio">
+                <div class="precio" th:if="${!p.tieneDescuento}">
                     S/ <span th:text="${p.precioVenta}"></span>
+                </div>
+
+                <div class="precio" th:if="${p.tieneDescuento}">
+                    <small class="texto-muted">
+                        Antes S/ <span th:text="${p.precioVenta}"></span>
+                    </small>
+                    <br>
+                    S/ <span th:text="${p.precioConDescuento}"></span>
+                    <span class="badge-descuento">
+                        -<span th:text="${p.descuentoRedondeado}"></span>%
+                    </span>
                 </div>
 
                 <!-- STOCK -->
@@ -136,5 +147,11 @@
     🛒
     <span class="badge" th:text="${cantidadCarrito}">0</span>
 </a>
+
+<script>
+setInterval(function () {
+    window.location.reload();
+}, 10000);
+</script>
 </body>
 </html>

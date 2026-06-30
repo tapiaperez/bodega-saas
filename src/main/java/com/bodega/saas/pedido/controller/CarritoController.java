@@ -55,7 +55,7 @@ public class CarritoController {
             item.setCantidad(nuevaCantidad);
 
             // RECALCULAR SUBTOTAL
-            BigDecimal subtotal = producto.getPrecioVenta()
+            BigDecimal subtotal = producto.getPrecioConDescuento()
                     .multiply(BigDecimal.valueOf(nuevaCantidad));
 
             item.setSubtotal(subtotal);
@@ -66,9 +66,9 @@ public class CarritoController {
 
             // LLENAR DATOS COMPLETOS
             item.setNombre(producto.getNombre());
-            item.setPrecio(producto.getPrecioVenta());
+            item.setPrecio(producto.getPrecioConDescuento());
 
-            BigDecimal subtotal = producto.getPrecioVenta()
+            BigDecimal subtotal = producto.getPrecioConDescuento()
                     .multiply(BigDecimal.valueOf(cantidad));
 
             item.setSubtotal(subtotal);

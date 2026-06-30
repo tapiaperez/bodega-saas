@@ -104,17 +104,23 @@
                         <tr>
                             <th>Producto</th>
                             <th>Cant.</th>
+                            <th>P. Unit.</th>
                             <th>Subtotal</th>
                         </tr>
                     </thead>
 
                     <tbody>
 
-                        <tr th:each="item : ${items}">
+                        <tr th:each="d : ${detalles}">
 
                             <td th:text="${nombresProductos.get(d.idProducto)}"></td>
 
                             <td th:text="${d.cantidad}"></td>
+
+                            <td>
+                                S/
+                                <span th:text="${d.precioUnitario}"></span>
+                            </td>
 
                             <td>
                                 S/

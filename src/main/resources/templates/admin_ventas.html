@@ -50,7 +50,16 @@
                         <strong th:text="${p.nombre}"></strong>
 
                         <div class="pos-detalle">
-                            S/ <span th:text="${p.precioVenta}"></span>
+                            <span th:if="${!p.tieneDescuento}">
+                                S/ <span th:text="${p.precioVenta}"></span>
+                            </span>
+
+                            <span th:if="${p.tieneDescuento}">
+                                S/ <span th:text="${p.precioConDescuento}"></span>
+                                <span class="badge-descuento">
+                                    -<span th:text="${p.descuentoRedondeado}"></span>%
+                                </span>
+                            </span>
                             |
                             Stock:
                             <span th:text="${p.stockActual}"></span>

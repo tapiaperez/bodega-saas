@@ -106,7 +106,7 @@ public class CheckoutController {
             // VALIDACIÓN
             if (producto == null) continue;
 
-            BigDecimal precio = producto.getPrecioVenta();
+            BigDecimal precio = producto.getPrecioConDescuento();
 
             BigDecimal subtotal = precio.multiply(
                     BigDecimal.valueOf(item.getCantidad())
