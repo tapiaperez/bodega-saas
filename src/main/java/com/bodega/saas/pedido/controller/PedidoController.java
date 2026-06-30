@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 
@@ -24,7 +25,8 @@ public class PedidoController {
                                 @RequestParam String telefono,
                                 @RequestParam String direccion,
                                 @RequestParam Double total,
-                                HttpSession session) {
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes) {
 
         Pedido pedido = new Pedido();
 
@@ -44,6 +46,13 @@ public class PedidoController {
         pedido.setTotal(BigDecimal.valueOf(total));
 
         pedidoRepository.save(pedido);
+
+        redirectAttributes.addFlashAttribute("idPedido", pedido.getIdPedido());
+        redirectAttributes.addFlashAttribute("nombreContacto", nombre);
+        redirectAttributes.addFlashAttribute("telefonoContacto", telefono);
+        redirectAttributes.addFlashAttribute("tipoEntrega", "DELIVERY");
+        redirectAttributes.addFlashAttribute("direccionEnvio", direccion);
+        redirectAttributes.addFlashAttribute("totalPedido", pedido.getTotal());
 
         return "redirect:/pedido-exitoso";
     }

@@ -36,16 +36,16 @@
     <!-- DASHBOARD INVENTARIO -->
     <div class="dashboard-grid inventario-dashboard">
 
-        <div class="dashboard-card">
-            <div class="dashboard-icon">📦</div>
+        <button type="button" class="dashboard-card dashboard-card-clickable activo" data-inventario-filtro="todos">
+            <div class="dashboard-icon">P</div>
             <div class="dashboard-info">
                 <h3>Productos</h3>
                 <span class="dashboard-number" th:text="${totalProductos}">0</span>
             </div>
-        </div>
+        </button>
 
-        <div class="dashboard-card">
-            <div class="dashboard-icon">✅</div>
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-inventario-filtro="disponibles">
+            <div class="dashboard-icon">OK</div>
             <div class="dashboard-info">
                 <h3>Disponibles</h3>
                 <span class="dashboard-number"
@@ -53,18 +53,18 @@
                     0
                 </span>
             </div>
-        </div>
+        </button>
 
-        <div class="dashboard-card">
-            <div class="dashboard-icon">⚠️</div>
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-inventario-filtro="stock-bajo">
+            <div class="dashboard-icon">!</div>
             <div class="dashboard-info">
                 <h3>Stock Bajo</h3>
                 <span class="dashboard-number" th:text="${stockBajo}">0</span>
             </div>
-        </div>
+        </button>
 
-        <div class="dashboard-card">
-            <div class="dashboard-icon">⛔</div>
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-inventario-filtro="agotados">
+            <div class="dashboard-icon">0</div>
             <div class="dashboard-info">
                 <h3>Agotados</h3>
                 <span class="dashboard-number"
@@ -72,10 +72,9 @@
                     0
                 </span>
             </div>
-        </div>
+        </button>
 
     </div>
-
     <!-- FILTROS -->
     <form method="get" th:action="@{/admin/productos}" class="inventario-filtros">
 
@@ -132,7 +131,7 @@
                 </td>
             </tr>
 
-            <tr th:each="p : ${productos}">
+            <tr th:each="p : ${productos}" class="fila-producto" th:attr="data-stock=${p.stockActual != null ? p.stockActual : 0},data-stock-minimo=${p.stockMinimo != null ? p.stockMinimo : 0},data-estado=${p.estado}">
 
                 <td>
                     <img class="producto-miniatura"
@@ -326,11 +325,11 @@
 
                     <div class="form-group">
                         <label>Imagen URL</label>
-                        <input type="url"
+                        <input type="text"
                                id="imagenUrl"
                                name="imagenUrl"
                                maxlength="255"
-                               placeholder="https://...">
+                               placeholder="/img/productos/producto.jpg o https://...">
                     </div>
 
                 </div>

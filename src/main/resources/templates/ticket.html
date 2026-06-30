@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ticket de Venta</title>
-<link rel="stylesheet" th:href="@{/css/style.css}">
-<link rel="stylesheet" th:href="@{/css/ticket.css}">
+<link rel="stylesheet"
+      href="/css/style.css?v=sprint4-ui-2"
+      th:href="@{/css/style.css(v='sprint4-ui-2')}">
+<link rel="stylesheet"
+      href="/css/ticket.css?v=sprint4-ui-2"
+      th:href="@{/css/ticket.css(v='sprint4-ui-2')}">
 <script th:src="@{/js/ticket.js}"></script>
     
 </head>
@@ -76,6 +80,11 @@
                         <div class="producto-sub">
                             Venta POS
                         </div>
+                        <div th:if="${item.tieneDescuento}" class="producto-descuento">
+                            Oferta -<span th:text="${item.descuentoRedondeado}"></span>%
+                            · Antes S/ <span th:text="${item.precioOriginal}"></span>
+                            · Ahorro S/ <span th:text="${item.ahorroTotal}"></span>
+                        </div>
                     </td>
 
                     <td class="col-cant" th:text="${item.cantidad}">1</td>
@@ -92,6 +101,10 @@
             </table>
 
             <div class="ticket-total-box">
+                <div th:if="${tieneAhorro}" class="ticket-ahorro-row">
+                    <span>Ahorro por ofertas</span>
+                    <strong>S/ <span th:text="${ahorroTotal}">0.00</span></strong>
+                </div>
                 <div class="ticket-total-row">
                     <span>TOTAL</span>
                     <span>S/ <span th:text="${venta.total}">0.00</span></span>

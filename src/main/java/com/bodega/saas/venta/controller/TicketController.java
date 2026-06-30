@@ -10,6 +10,8 @@ import com.bodega.saas.producto.repository.ProductoRepository;
 import com.bodega.saas.venta.repository.DetalleVentaRepository;
 import com.bodega.saas.venta.repository.VentaRepository;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +48,8 @@ public class TicketController {
         List<TicketItem> items =
                 new ArrayList<>();
 
+        BigDecimal ahorroTotal = BigDecimal.ZERO;
+
         for (DetalleVenta d : detalles) {
 
             Producto producto =
@@ -65,11 +69,43 @@ public class TicketController {
 
             item.setSubtotal(d.getSubtotal());
 
+            if (producto != null) {
+                BigDecimal precioOriginal = producto.getPrecioVenta();
+                BigDecimal precioVendido = d.getPrecioUnitario();
+
+                item.setPrecioOriginal(precioOriginal);
+
+                if (precioOriginal != null
+                        && precioVendido != null
+                        && precioOriginal.compareTo(precioVendido) > 0) {
+
+                    BigDecimal ahorroUnitario =
+                            precioOriginal.subtract(precioVendido)
+                                    .setScale(2, RoundingMode.HALF_UP);
+
+                    BigDecimal descuento =
+                            ahorroUnitario
+                                    .multiply(BigDecimal.valueOf(100))
+                                    .divide(precioOriginal, 2, RoundingMode.HALF_UP);
+
+                    item.setAhorroUnitario(ahorroUnitario);
+                    item.setDescuento(descuento);
+
+                    ahorroTotal = ahorroTotal.add(item.getAhorroTotal());
+
+                } else {
+                    item.setAhorroUnitario(BigDecimal.ZERO);
+                    item.setDescuento(BigDecimal.ZERO);
+                }
+            }
+
             items.add(item);
 
         }
 
         model.addAttribute("items", items);
+        model.addAttribute("ahorroTotal", ahorroTotal);
+        model.addAttribute("tieneAhorro", ahorroTotal.compareTo(BigDecimal.ZERO) > 0);
 
         return "ticket";
     }

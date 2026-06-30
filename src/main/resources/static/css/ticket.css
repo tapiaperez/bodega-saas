@@ -133,6 +133,14 @@
             margin-top: 3px;
         }
 
+        .producto-descuento {
+            margin-top: 4px;
+            color: #d32f2f;
+            font-size: 10px;
+            font-weight: bold;
+            line-height: 1.35;
+        }
+
         .ticket-total-box {
             margin-top: 14px;
             padding: 14px;
@@ -148,6 +156,18 @@
             font-size: 22px;
             font-weight: bold;
             color: #1b5e20;
+        }
+
+        .ticket-ahorro-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #a5d6a7;
+            color: #d32f2f;
+            font-size: 13px;
+            font-weight: bold;
         }
 
         .ticket-footer {

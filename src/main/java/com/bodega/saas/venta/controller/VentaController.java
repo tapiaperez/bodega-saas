@@ -21,6 +21,7 @@ import com.bodega.saas.venta.dto.VentaItem;
 import com.bodega.saas.venta.model.Venta;
 import com.bodega.saas.venta.service.VentaService;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.math.RoundingMode;
 
 
 
@@ -51,16 +52,20 @@ public class VentaController {
         }
 
         BigDecimal total = BigDecimal.ZERO;
+        BigDecimal ahorroTotal = BigDecimal.ZERO;
 
         for (VentaItem item : venta) {
 
             total = total.add(item.getSubtotal());
+            ahorroTotal = ahorroTotal.add(item.getAhorroTotal());
 
         }
 
         model.addAttribute("venta", venta);
 
         model.addAttribute("total", total);
+        model.addAttribute("ahorroTotal", ahorroTotal);
+        model.addAttribute("tieneAhorro", ahorroTotal.compareTo(BigDecimal.ZERO) > 0);
 
         return "admin_ventas";
     }
@@ -124,6 +129,12 @@ public class VentaController {
             item.setNombre(producto.getNombre());
 
             item.setPrecio(producto.getPrecioConDescuento());
+
+            item.setPrecioOriginal(producto.getPrecioVenta());
+
+            item.setDescuento(producto.getDescuento());
+
+            item.setAhorroUnitario(calcularAhorroUnitario(producto));
 
             item.setCantidad(cantidad);
 
@@ -227,5 +238,19 @@ public class VentaController {
                 return "redirect:/admin/ventas";
 
             }
+
+    private BigDecimal calcularAhorroUnitario(Producto producto) {
+
+        BigDecimal precioOriginal = producto.getPrecioVenta();
+        BigDecimal precioVenta = producto.getPrecioConDescuento();
+
+        if (precioOriginal == null
+                || precioVenta == null
+                || precioOriginal.compareTo(precioVenta) <= 0) {
+            return BigDecimal.ZERO;
+        }
+
+        return precioOriginal.subtract(precioVenta).setScale(2, RoundingMode.HALF_UP);
+    }
 
 }

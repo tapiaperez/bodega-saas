@@ -129,6 +129,13 @@ public class CheckoutController {
 
         session.removeAttribute("carrito");
 
+        redirectAttributes.addFlashAttribute("idPedido", pedido.getIdPedido());
+        redirectAttributes.addFlashAttribute("nombreContacto", nombreContacto);
+        redirectAttributes.addFlashAttribute("telefonoContacto", telefonoContacto);
+        redirectAttributes.addFlashAttribute("tipoEntrega", tipoEntrega);
+        redirectAttributes.addFlashAttribute("direccionEnvio", pedido.getDireccionEnvio());
+        redirectAttributes.addFlashAttribute("totalPedido", total);
+
         return "redirect:/pedido-exitoso";
     }
 }

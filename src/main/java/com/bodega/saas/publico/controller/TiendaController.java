@@ -49,7 +49,7 @@ public class TiendaController {
 
             model.addAttribute(
                     "productos",
-                    productoRepository.findByIdEmpresaAndCategoria_IdCategoria(
+                    productoRepository.obtenerCatalogoDisponiblePorCategoria(
                             idEmpresa,
                             categoria
                     )
@@ -61,7 +61,7 @@ public class TiendaController {
 
             model.addAttribute(
                     "productos",
-                    productoRepository.findByIdEmpresa(idEmpresa)
+                    productoRepository.obtenerCatalogoDisponible(idEmpresa)
             );
         }
 

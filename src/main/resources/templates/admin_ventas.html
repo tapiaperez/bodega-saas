@@ -2,7 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Punto de Venta</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet"
+          href="/css/style.css?v=sprint4-ui-2"
+          th:href="@{/css/style.css(v='sprint4-ui-2')}">
 </head>
 
 <body>
@@ -123,6 +125,12 @@
 
                     </div>
 
+                    <div th:if="${item.tieneDescuento}" class="venta-ahorro">
+                        Oferta -<span th:text="${item.descuentoRedondeado}"></span>%
+                        <span>Antes S/ <span th:text="${item.precioOriginal}"></span></span>
+                        <span>Ahorras S/ <span th:text="${item.ahorroTotal}"></span></span>
+                    </div>
+
                 </div>
 
                 <div class="venta-acciones">
@@ -154,6 +162,9 @@
             </div>
 
                 <div class="total-pos">
+                    <div th:if="${tieneAhorro}" class="total-ahorro">
+                        Ahorro por ofertas: S/ <span th:text="${ahorroTotal}"></span>
+                    </div>
                     TOTAL:
                     S/ <span th:text="${total}"></span>
                 </div>

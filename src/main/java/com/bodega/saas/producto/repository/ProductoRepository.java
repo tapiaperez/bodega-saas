@@ -22,6 +22,34 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
             Long idEmpresa,
             Long idCategoria);
 
+    @Query("""
+            SELECT p
+            FROM Producto p
+            WHERE p.idEmpresa = :idEmpresa
+            AND p.estado = 1
+            AND COALESCE(p.stockActual, 0) > 0
+            ORDER BY
+                CASE WHEN COALESCE(p.descuento, 0) > 0 THEN 0 ELSE 1 END,
+                p.nombre ASC
+            """)
+    List<Producto> obtenerCatalogoDisponible(
+            @Param("idEmpresa") Long idEmpresa);
+
+    @Query("""
+            SELECT p
+            FROM Producto p
+            WHERE p.idEmpresa = :idEmpresa
+            AND p.categoria.idCategoria = :idCategoria
+            AND p.estado = 1
+            AND COALESCE(p.stockActual, 0) > 0
+            ORDER BY
+                CASE WHEN COALESCE(p.descuento, 0) > 0 THEN 0 ELSE 1 END,
+                p.nombre ASC
+            """)
+    List<Producto> obtenerCatalogoDisponiblePorCategoria(
+            @Param("idEmpresa") Long idEmpresa,
+            @Param("idCategoria") Long idCategoria);
+
     /*====================================================
      * INVENTARIO (HU03)
      *====================================================*/
@@ -75,5 +103,14 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     Long countByEstadoAndStockActualGreaterThan(Integer estado, Integer stockActual);
 
     Long countByEstadoAndStockActualLessThanEqual(Integer estado, Integer stockActual);
+
+    @Query("""
+            SELECT p
+            FROM Producto p
+            WHERE p.estado = 1
+            AND COALESCE(p.descuento, 0) > 0
+            ORDER BY p.descuento DESC, p.nombre ASC
+            """)
+    List<Producto> obtenerProductosConOferta();
 
 }

@@ -1,28 +1,50 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Pedido Exitoso</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido registrado</title>
+    <link rel="stylesheet"
+          href="/css/style.css?v=sprint4-ui-2"
+          th:href="@{/css/style.css(v='sprint4-ui-2')}">
 </head>
 
-<body>
+<body class="pedido-exito-page">
 
-<div class="container" style="text-align:center; margin-top:100px;">
+<main class="pedido-exito-card">
+    <div class="pedido-exito-icon">✓</div>
+    <h1>Pedido registrado</h1>
+    <p class="pedido-exito-text">
+        Tu pedido fue enviado correctamente. Lo atenderemos en breve.
+    </p>
 
-    <div style="background:white; padding:40px; border-radius:10px; box-shadow:0 3px 15px rgba(0,0,0,0.2); display:inline-block;">
+    <section th:if="${idPedido != null}" class="pedido-resumen">
+        <div class="pedido-resumen-row">
+            <span>Número de pedido</span>
+            <strong>#<span th:text="${idPedido}"></span></strong>
+        </div>
+        <div class="pedido-resumen-row">
+            <span>Cliente</span>
+            <strong th:text="${nombreContacto}">Cliente</strong>
+        </div>
+        <div class="pedido-resumen-row">
+            <span>Entrega</span>
+            <strong th:text="${tipoEntrega}">DELIVERY</strong>
+        </div>
+        <div class="pedido-resumen-row" th:if="${direccionEnvio != null}">
+            <span>Dirección</span>
+            <strong th:text="${direccionEnvio}">Dirección</strong>
+        </div>
+        <div class="pedido-resumen-row pedido-resumen-total">
+            <span>Total</span>
+            <strong>S/ <span th:text="${totalPedido}">0.00</span></strong>
+        </div>
+    </section>
 
-        <h1 style="color:green;">✔ Pedido registrado</h1>
-
-        <p>Tu pedido fue enviado correctamente.</p>
-
-        <br>
-
-        <a th:href="@{'/tienda/' + ${idEmpresa}}" class="btn">
-            Volver al catálogo
-        </a>
-    </div>
-
-</div>
+    <a th:href="@{'/tienda/' + ${idEmpresa}}" class="btn pedido-exito-btn">
+        Volver al catálogo
+    </a>
+</main>
 
 </body>
 </html>

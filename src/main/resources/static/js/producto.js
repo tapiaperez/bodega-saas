@@ -210,6 +210,9 @@ if(formulario){
             parseInt(
                 document.getElementById("stockActual").value);
 
+        const imagenUrl =
+            document.getElementById("imagenUrl").value.trim();
+
         if(nombre===""){
 
             alert("Debe ingresar el nombre del producto.");
@@ -250,6 +253,19 @@ if(formulario){
 
         }
 
+        if(imagenUrl !== ""
+                && !imagenUrl.startsWith("/")
+                && !imagenUrl.startsWith("http://")
+                && !imagenUrl.startsWith("https://")){
+
+            alert("La imagen debe ser una ruta interna (/img/...) o una URL http/https.");
+
+            e.preventDefault();
+
+            return;
+
+        }
+
     });
 
 }
@@ -279,3 +295,51 @@ if(formulario){
 // ajax eliminar
 
 // ajax oferta
+
+/*=========================================
+    FILTROS DASHBOARD INVENTARIO
+=========================================*/
+
+document.querySelectorAll("[data-inventario-filtro]").forEach(function(card){
+
+    card.addEventListener("click", function(){
+
+        const filtro = this.dataset.inventarioFiltro;
+
+        document.querySelectorAll("[data-inventario-filtro]").forEach(function(item){
+            item.classList.remove("activo");
+        });
+
+        this.classList.add("activo");
+
+        document.querySelectorAll(".fila-producto").forEach(function(fila){
+
+            const stock = parseInt(fila.dataset.stock || "0", 10);
+            const stockMinimo = parseInt(fila.dataset.stockMinimo || "0", 10);
+            let mostrar = true;
+
+            if(filtro === "disponibles"){
+                mostrar = stock > 0;
+            }
+
+            if(filtro === "stock-bajo"){
+                mostrar = stock > 0 && stockMinimo > 0 && stock <= stockMinimo;
+            }
+
+            if(filtro === "agotados"){
+                mostrar = stock <= 0;
+            }
+
+            fila.style.display = mostrar ? "" : "none";
+
+        });
+
+        const tabla = document.querySelector(".tabla-contenedor");
+
+        if(tabla){
+            tabla.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+    });
+
+});
