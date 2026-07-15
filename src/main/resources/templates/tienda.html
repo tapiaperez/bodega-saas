@@ -12,14 +12,31 @@
     <h1>🏪 Bodega Don Pepe</h1>
 
     <div class="nav">
-        <a href="/carrito">🛒 Carrito</a>
+        <a href="/carrito">
+            🛒 Carrito
+            (<span th:text="${cantidadCarrito}">0</span>)
+        </a>
     </div>
 </div>
 
 <div class="container">
 
     <h2 class="titulo-seccion">Catálogo</h2>
+    <div class="filtros-categorias">
 
+        <a th:href="@{/tienda/{id}(id=${idEmpresa})}"
+        class="btn-categoria">
+            Todas
+        </a>
+
+        <a th:each="cat : ${categorias}"
+        th:href="@{/tienda/{id}(id=${idEmpresa},categoria=${cat.idCategoria})}"
+        class="btn-categoria"
+        th:classappend="${categoriaSeleccionada == cat.idCategoria} ? ' categoria-activa' : ''"
+        th:text="${cat.nombre}">
+        </a>
+
+    </div>
     <div class="catalogo">
 
         <div class="producto-card" th:each="p : ${productos}">
@@ -28,20 +45,66 @@
 
             <!-- IMAGEN -->
             <div class="producto-img">
-                <span th:text="${p.nombre}"></span>
+
+                <img th:src="${p.imagenUrl != null ? p.imagenUrl : '/img/productos/default.png'}"
+                    th:alt="${p.nombre}"
+                    class="img-producto">
+
             </div>
 
             <!-- BODY -->
             <div class="producto-body">
 
                 <h3 th:text="${p.nombre}"></h3>
+                <div class="categoria-producto">
+                    <span th:if="${p.categoria != null}"
+                        th:text="${p.categoria.nombre}">
+                    </span>
+                </div>
 
                 <p th:text="${p.descripcion}"></p>
 
                 <!-- PRECIO -->
-                <div class="precio">
+                <div class="precio" th:if="${!p.tieneDescuento}">
                     S/ <span th:text="${p.precioVenta}"></span>
                 </div>
+
+                <div class="precio" th:if="${p.tieneDescuento}">
+                    <small class="texto-muted">
+                        Antes S/ <span th:text="${p.precioVenta}"></span>
+                    </small>
+                    <br>
+                    S/ <span th:text="${p.precioConDescuento}"></span>
+                    <span class="badge-descuento">
+                        -<span th:text="${p.descuentoRedondeado}"></span>%
+                    </span>
+                </div>
+
+                <!-- STOCK -->
+                    <div th:if="${p.stockActual > 5}" class="stock-disponible">
+
+                        ✔ Disponible
+                        (<span th:text="${p.stockActual}"></span>)
+
+                    </div>
+
+                    <div th:if="${p.stockActual > 0 and p.stockActual <= 5}"
+                        class="stock-bajo">
+
+                        ⚠ Últimas unidades
+                        (<span th:text="${p.stockActual}"></span>)
+
+                    </div>
+
+                    <div th:if="${p.stockActual == 0}"
+                        class="stock-agotado">
+
+                        ❌ Agotado
+
+                    </div>
+
+
+
 
                 <!-- FORM -->
                 <form action="/carrito/agregar" method="post">
@@ -50,8 +113,24 @@
                     <input type="hidden" name="idEmpresa" th:value="${idEmpresa}">
 
                     <div class="acciones">
-                        <input type="number" name="cantidad" value="1" min="1">
-                        <button class="btn-agregar">+ Agregar</button>
+                        <input type="number" name="cantidad" value="1" min="1" th:attr="max=${p.stockActual}">
+                        <div th:if="${p.stockActual > 0}">
+
+                            <button class="btn-agregar">
+                                🛒 Agregar al carrito
+                            </button>
+
+                        </div>
+
+                        <div th:if="${p.stockActual == 0}">
+
+                            <button class="btn-agotado" disabled>
+
+                                AGOTADO
+
+                            </button>
+
+                        </div>
                     </div>
 
                 </form>
@@ -68,5 +147,11 @@
     🛒
     <span class="badge" th:text="${cantidadCarrito}">0</span>
 </a>
+
+<script>
+setInterval(function () {
+    window.location.reload();
+}, 10000);
+</script>
 </body>
 </html>

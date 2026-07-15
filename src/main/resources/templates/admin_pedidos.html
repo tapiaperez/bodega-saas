@@ -4,8 +4,11 @@
 <head>
     <title>Pedidos</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    
 </head>
 <body>
+
+<div th:replace="~{fragments/admin_header :: adminHeader('Pedidos Web')}"></div>
 
 <div class="container">
 
@@ -13,19 +16,94 @@
 
     <table class="tabla">
         <tr>
-            <th>ID</th>
+            <th>N° Pedido</th>
+            <th>Cliente</th>
+            <th>Teléfono</th>
             <th>Total</th>
+            <th>Fecha</th>
             <th>Estado</th>
+            <th>Acción</th>
         </tr>
 
-        <tr th:each="p : ${pedidos}">
-            <td th:text="${p.idPedido}"></td>
-            <td th:text="${p.total}"></td>
-            <td th:text="${p.estado}"></td>
+        <tr th:each="pedido : ${pedidos}">
+
+            <td>
+                #<span th:text="${pedido.idPedido}"></span>
+            </td>
+
+            <td th:text="${pedido.nombreContacto}">
+            </td>
+
+            <td th:text="${pedido.telefonoContacto}">
+            </td>
+
+            <td>
+                S/
+                <span th:text="${pedido.total}"></span>
+            </td>
+
+           <td th:text="${#temporals.format(pedido.fechaPedido,'dd/MM/yyyy HH:mm')}"> </td>
+
+            <td>
+
+                <span class="badge-pendiente"
+                    th:if="${pedido.estado=='PENDIENTE'}">
+                    PENDIENTE
+                </span>
+
+                <span class="badge-confirmado"
+                    th:if="${pedido.estado=='CONFIRMADO'}">
+                    CONFIRMADO
+                </span>
+
+                <span class="badge-preparacion"
+                    th:if="${pedido.estado=='EN_PREPARACION'}">
+                    EN PREPARACIÓN
+                </span>
+
+                <span class="badge-camino"
+                    th:if="${pedido.estado=='EN_CAMINO'}">
+                    EN CAMINO
+                </span>
+
+                <span class="badge-entregado"
+                    th:if="${pedido.estado=='ENTREGADO'}">
+                    ENTREGADO
+                </span>
+
+                <span class="badge-anulado"
+                    th:if="${pedido.estado=='ANULADO'}">
+                    ANULADO
+                </span>
+
+            </td>
+
+            <td>
+
+                <a th:href="@{/admin/pedidos/{id}(id=${pedido.idPedido})}"
+                class="btn-ver">
+
+                    👁 Ver
+
+                </a>
+
+            </td>
+
         </tr>
     </table>
 
 </div>
 
+<script>
+
+setInterval(function () {
+
+    if (!document.hidden) {
+        window.location.reload();
+    }
+
+}, 10000);
+
+</script>
 </body>
 </html>

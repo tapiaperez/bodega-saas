@@ -55,7 +55,7 @@ public class CarritoController {
             item.setCantidad(nuevaCantidad);
 
             // RECALCULAR SUBTOTAL
-            BigDecimal subtotal = producto.getPrecioVenta()
+            BigDecimal subtotal = producto.getPrecioConDescuento()
                     .multiply(BigDecimal.valueOf(nuevaCantidad));
 
             item.setSubtotal(subtotal);
@@ -66,9 +66,9 @@ public class CarritoController {
 
             // LLENAR DATOS COMPLETOS
             item.setNombre(producto.getNombre());
-            item.setPrecio(producto.getPrecioVenta());
+            item.setPrecio(producto.getPrecioConDescuento());
 
-            BigDecimal subtotal = producto.getPrecioVenta()
+            BigDecimal subtotal = producto.getPrecioConDescuento()
                     .multiply(BigDecimal.valueOf(cantidad));
 
             item.setSubtotal(subtotal);
@@ -81,4 +81,79 @@ public class CarritoController {
 
         return "redirect:/tienda/" + idEmpresa;
     }
+
+    @PostMapping("/eliminar")
+        public String eliminar(
+                @RequestParam Long idProducto,
+                HttpSession session) {
+
+            Object obj = session.getAttribute("carrito");
+
+            if (!(obj instanceof List<?>)) {
+                return "redirect:/carrito";
+            }
+
+            List<ItemCarrito> carrito = (List<ItemCarrito>) obj;
+
+            carrito.removeIf(item ->
+                    item.getIdProducto().equals(idProducto));
+
+            session.setAttribute("carrito", carrito);
+
+            return "redirect:/carrito";
+        }
+
+        @PostMapping("/vaciar")
+            public String vaciar(HttpSession session) {
+
+                session.removeAttribute("carrito");
+
+                return "redirect:/carrito";
+            }
+
+            @PostMapping("/actualizar")
+            public String actualizar(
+                    @RequestParam Long idProducto,
+                    @RequestParam Integer cantidad,
+                    HttpSession session) {
+
+                Object obj = session.getAttribute("carrito");
+
+                if (!(obj instanceof List<?>)) {
+                    return "redirect:/carrito";
+                }
+
+                List<ItemCarrito> carrito =
+                        (List<ItemCarrito>) obj;
+
+                for (ItemCarrito item : carrito) {
+
+                    if (item.getIdProducto().equals(idProducto)) {
+                        Producto producto = productoRepository
+                                .findById(idProducto)
+                                .orElse(null);
+
+                        if(producto != null &&
+                        cantidad > producto.getStockActual()){
+
+                            cantidad = producto.getStockActual();
+                        }
+                        item.setCantidad(cantidad);
+
+                        BigDecimal subtotal =
+                                item.getPrecio()
+                                    .multiply(
+                                        BigDecimal.valueOf(cantidad)
+                                    );
+
+                        item.setSubtotal(subtotal);
+
+                        break;
+                    }
+                }
+
+                session.setAttribute("carrito", carrito);
+
+                return "redirect:/carrito";
+            }
 }

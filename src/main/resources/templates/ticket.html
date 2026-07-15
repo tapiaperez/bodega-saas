@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket de Venta</title>
+<link rel="stylesheet"
+      href="/css/style.css?v=sprint4-ui-2"
+      th:href="@{/css/style.css(v='sprint4-ui-2')}">
+<link rel="stylesheet"
+      href="/css/ticket.css?v=sprint4-ui-2"
+      th:href="@{/css/ticket.css(v='sprint4-ui-2')}">
+<script th:src="@{/js/ticket.js}"></script>
+    
+</head>
+
+<body>
+
+<div th:replace="~{fragments/admin_header :: adminHeader('Ticket de Venta')}"></div>
+
+<div class="ticket-page">
+
+    <div>
+
+        <div class="ticket-box">
+
+            <div class="ticket-header">
+                <div class="ticket-logo">🛒</div>
+                <h1>BODEGA EXPRESS</h1>
+                <div class="ticket-slogan">Siempre cerca de ti</div>
+
+                <div class="ticket-info">
+                    <div>RUC: 20123456789</div>
+                    <div>Av. Principal 123 - Lima</div>
+                    <div>Tel: 987 654 321</div>
+                </div>
+            </div>
+
+            <hr class="ticket-line">
+
+            <h2 class="ticket-title">TICKET DE VENTA</h2>
+
+            <div class="ticket-number">
+                <span th:text="${venta.serie}">T001</span>-<span th:text="${#numbers.formatInteger(venta.correlativo, 6)}">000001</span>
+            </div>
+
+            <div class="ticket-meta">
+                <div class="ticket-meta-row">
+                    <span>Fecha:</span>
+                    <strong th:text="${#temporals.format(venta.fechaEmision,'dd/MM/yyyy HH:mm')}">27/06/2026 23:00</strong>
+                </div>
+
+                <div class="ticket-meta-row">
+                    <span>Origen:</span>
+                    <strong th:text="${venta.origen}">POS</strong>
+                </div>
+
+                <div class="ticket-meta-row">
+                    <span>Estado:</span>
+                    <strong th:text="${venta.estado}">REGISTRADA</strong>
+                </div>
+            </div>
+
+            <hr class="ticket-line">
+
+            <table class="ticket-table">
+                <thead>
+                <tr>
+                    <th class="col-producto">Producto</th>
+                    <th class="col-cant">Cant.</th>
+                    <th class="col-precio">P.Unit.</th>
+                    <th class="col-total">Total</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="item : ${items}">
+                    <td class="col-producto">
+                        <div class="producto-nombre" th:text="${item.nombre}">Producto</div>
+                        <div class="producto-sub">
+                            Venta POS
+                        </div>
+                        <div th:if="${item.tieneDescuento}" class="producto-descuento">
+                            Oferta -<span th:text="${item.descuentoRedondeado}"></span>%
+                            · Antes S/ <span th:text="${item.precioOriginal}"></span>
+                            · Ahorro S/ <span th:text="${item.ahorroTotal}"></span>
+                        </div>
+                    </td>
+
+                    <td class="col-cant" th:text="${item.cantidad}">1</td>
+
+                    <td class="col-precio">
+                        S/ <span th:text="${item.precio}">0.00</span>
+                    </td>
+
+                    <td class="col-total">
+                        S/ <span th:text="${item.subtotal}">0.00</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="ticket-total-box">
+                <div th:if="${tieneAhorro}" class="ticket-ahorro-row">
+                    <span>Ahorro por ofertas</span>
+                    <strong>S/ <span th:text="${ahorroTotal}">0.00</span></strong>
+                </div>
+                <div class="ticket-total-row">
+                    <span>TOTAL</span>
+                    <span>S/ <span th:text="${venta.total}">0.00</span></span>
+                </div>
+            </div>
+
+            <hr class="ticket-line">
+
+            <div class="ticket-footer">
+                <div><strong>¡Gracias por su compra!</strong></div>
+                <div>Vuelva pronto 😊</div>
+                <div>WhatsApp: 987 654 321</div>
+            </div>
+
+        </div>
+
+        <div class="acciones-ticket">
+            <button type="button"
+                    class="btn-ticket btn-imprimir"
+                    onclick="window.print()">
+                🖨 Imprimir
+            </button>
+
+            <a href="/admin/ventas"
+               class="btn-ticket btn-nueva">
+                🏠 Nueva Venta
+            </a>
+        </div>
+
+        <div class="ticket-watermark">
+            Sistema Web de Gestión Comercial - Bodega Express
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

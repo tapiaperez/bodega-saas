@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Dashboard</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
@@ -7,34 +8,27 @@
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-    <h1>🏪 Bodega Express</h1>
-
-    <div class="nav">
-        <a href="/tienda/1">Catálogo</a>
-        <a href="/admin/pedidos">Pedidos</a>
-        <a href="/logout">Salir</a>
-    </div>
-</div>
+<div th:replace="~{fragments/admin_header :: adminHeader('Bodega Express')}"></div>
 
 <div class="container">
 
-    <!-- BIENVENIDA -->
-    <h2>Bienvenido, Administrador</h2>
+    <h2>
+        Bienvenido,
+        <span th:text="${usuario != null ? usuario.nombreCompleto : 'Usuario'}">
+            Usuario
+        </span>
+    </h2>
 
     <div style="background:#e3f2fd; padding:15px; border-radius:8px; margin-bottom:20px;">
-        Estás gestionando: <b>Bodega Don Pepe</b>
+        Estás gestionando la empresa #
+        <b th:text="${idEmpresa}">1</b>
     </div>
 
-    <!-- TARJETAS -->
     <div style="display:flex; gap:20px; flex-wrap:wrap;">
 
-        <!-- TIENDA PUBLICA -->
         <div style="flex:1; min-width:300px; background:white; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-
             <div style="background:#2e7d32; color:white; padding:10px; border-radius:10px 10px 0 0;">
-                🌐 Tu Tienda Pública
+                Tienda Pública
             </div>
 
             <div style="padding:15px;">
@@ -50,18 +44,77 @@
             </div>
         </div>
 
-        <!-- PEDIDOS -->
-        <div style="flex:1; min-width:300px; background:white; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-
-            <div style="background:#fbc02d; color:black; padding:10px; border-radius:10px 10px 0 0;">
-                📦 Pedidos Web
+        <div sec:authorize="hasAnyRole('ADMINISTRADOR','SUPERVISOR')"
+             style="flex:1; min-width:300px; background:white; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <div style="background:#198754; color:white; padding:10px; border-radius:10px 10px 0 0;">
+                Inventario
             </div>
 
             <div style="padding:15px;">
-                <p>Gestiona los pedidos realizados por tus clientes</p>
+                <p>Gestiona productos, stock, ofertas y desactivaciones.</p>
+
+                <a href="/admin/productos" class="btn">
+                    Ver Inventario
+                </a>
+            </div>
+        </div>
+
+        <div sec:authorize="hasAnyRole('ADMINISTRADOR','SUPERVISOR','CAJERO')"
+             style="flex:1; min-width:300px; background:white; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <div style="background:#fbc02d; color:black; padding:10px; border-radius:10px 10px 0 0;">
+                Pedidos Web
+            </div>
+
+            <div style="padding:15px;">
+                <p>Gestiona los pedidos realizados por tus clientes.</p>
 
                 <a href="/admin/pedidos" class="btn">
                     Ver Pedidos
+                </a>
+            </div>
+        </div>
+
+        <div sec:authorize="hasAnyRole('ADMINISTRADOR','SUPERVISOR','CAJERO')"
+             style="flex:1; min-width:300px; background:white; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <div style="background:#0d6efd; color:white; padding:10px; border-radius:10px 10px 0 0;">
+                Ventas POS
+            </div>
+
+            <div style="padding:15px;">
+                <p>Registra ventas presenciales y emite tickets.</p>
+
+                <a href="/admin/ventas" class="btn">
+                    Abrir POS
+                </a>
+            </div>
+        </div>
+
+        <div sec:authorize="hasAnyRole('ADMINISTRADOR','SUPERVISOR')"
+             style="flex:1; min-width:300px; background:white; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <div style="background:#6f42c1; color:white; padding:10px; border-radius:10px 10px 0 0;">
+                Reportes
+            </div>
+
+            <div style="padding:15px;">
+                <p>Consulta ventas, pedidos y métricas del negocio.</p>
+
+                <a href="/admin/reportes" class="btn">
+                    Ver Reportes
+                </a>
+            </div>
+        </div>
+
+        <div sec:authorize="hasRole('ADMINISTRADOR')"
+             style="flex:1; min-width:300px; background:white; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <div style="background:#343a40; color:white; padding:10px; border-radius:10px 10px 0 0;">
+                Empleados
+            </div>
+
+            <div style="padding:15px;">
+                <p>Administra usuarios, roles y accesos.</p>
+
+                <a href="/admin/empleados" class="btn">
+                    Gestionar Empleados
                 </a>
             </div>
         </div>

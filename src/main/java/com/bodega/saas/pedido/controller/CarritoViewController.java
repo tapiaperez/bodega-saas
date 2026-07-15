@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Controller
@@ -24,7 +25,13 @@ public class CarritoViewController {
             carrito = new ArrayList<>();
         }
 
-        model.addAttribute("carrito", carrito);
+    model.addAttribute("carrito", carrito);
+
+        BigDecimal total = carrito.stream()
+                .map(ItemCarrito::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("total", total);
 
         return "carrito";
     }

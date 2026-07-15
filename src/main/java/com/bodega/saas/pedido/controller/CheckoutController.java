@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class CheckoutController {
@@ -26,8 +27,17 @@ public class CheckoutController {
 
     @Autowired
     private ProductoRepository productoRepository; 
+    
     @PostMapping("/checkout")
-    public String procesar(HttpSession session) {
+    public String procesar(
+
+            @RequestParam String nombreContacto,
+            @RequestParam String telefonoContacto,
+            @RequestParam(required = false) String direccionEnvio,
+            @RequestParam String tipoEntrega,
+
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
 
         Object obj = session.getAttribute("carrito");
 
@@ -40,10 +50,48 @@ public class CheckoutController {
 
         if (carrito.isEmpty()) return "redirect:/";
 
+        // VALIDAR STOCK ANTES DE CREAR EL PEDIDO
+        for (ItemCarrito item : carrito) {
+
+            Producto producto = productoRepository
+                    .findById(item.getIdProducto())
+                    .orElse(null);
+
+            if (producto == null) {
+                return "redirect:/carrito";
+            }
+
+            if (item.getCantidad() > producto.getStockActual()) {
+
+                redirectAttributes.addFlashAttribute(
+                        "error",
+                        "⚠ El producto \"" + producto.getNombre()
+                        + "\" solo tiene "
+                        + producto.getStockActual()
+                        + " unidad(es) disponibles.");
+
+                return "redirect:/carrito";
+
+            }
+
+        }
+
         Pedido pedido = new Pedido();
         pedido.setIdEmpresa(idEmpresa);
         pedido.setEstado("PENDIENTE");
 
+        pedido.setNombreContacto(nombreContacto);
+
+        pedido.setTelefonoContacto(telefonoContacto);
+
+        if ("RECOJO".equals(tipoEntrega)) {
+
+            pedido.setDireccionEnvio("RECOJO EN TIENDA");
+
+        } else {
+
+            pedido.setDireccionEnvio(direccionEnvio);
+        }   
         pedidoRepository.save(pedido);
 
         BigDecimal total = BigDecimal.ZERO;
@@ -58,7 +106,7 @@ public class CheckoutController {
             // VALIDACIÓN
             if (producto == null) continue;
 
-            BigDecimal precio = producto.getPrecioVenta();
+            BigDecimal precio = producto.getPrecioConDescuento();
 
             BigDecimal subtotal = precio.multiply(
                     BigDecimal.valueOf(item.getCantidad())
@@ -80,6 +128,13 @@ public class CheckoutController {
         pedidoRepository.save(pedido);
 
         session.removeAttribute("carrito");
+
+        redirectAttributes.addFlashAttribute("idPedido", pedido.getIdPedido());
+        redirectAttributes.addFlashAttribute("nombreContacto", nombreContacto);
+        redirectAttributes.addFlashAttribute("telefonoContacto", telefonoContacto);
+        redirectAttributes.addFlashAttribute("tipoEntrega", tipoEntrega);
+        redirectAttributes.addFlashAttribute("direccionEnvio", pedido.getDireccionEnvio());
+        redirectAttributes.addFlashAttribute("totalPedido", total);
 
         return "redirect:/pedido-exitoso";
     }

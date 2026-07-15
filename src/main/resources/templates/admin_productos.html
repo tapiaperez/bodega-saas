@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Inventario</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/producto.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/admin_header :: adminHeader('Gesti�n de Inventario')}"></div>
+
+<div class="container">
+
+    <div class="inventario-header">
+        <h2 class="titulo-seccion">📦 Inventario de Productos</h2>
+
+        <button type="button"
+                class="btn-principal btn-nuevo-producto"
+                onclick="abrirModalNuevoProducto()">
+            ➕ Nuevo Producto
+        </button>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success">
+        <span th:text="${success}"></span>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger">
+        <span th:text="${error}"></span>
+    </div>
+
+    <!-- DASHBOARD INVENTARIO -->
+    <div class="dashboard-grid inventario-dashboard">
+
+        <button type="button" class="dashboard-card dashboard-card-clickable activo" data-inventario-filtro="todos">
+            <div class="dashboard-icon">P</div>
+            <div class="dashboard-info">
+                <h3>Productos</h3>
+                <span class="dashboard-number" th:text="${totalProductos}">0</span>
+            </div>
+        </button>
+
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-inventario-filtro="disponibles">
+            <div class="dashboard-icon">OK</div>
+            <div class="dashboard-info">
+                <h3>Disponibles</h3>
+                <span class="dashboard-number"
+                      th:text="${productosDisponibles != null ? productosDisponibles : 0}">
+                    0
+                </span>
+            </div>
+        </button>
+
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-inventario-filtro="stock-bajo">
+            <div class="dashboard-icon">!</div>
+            <div class="dashboard-info">
+                <h3>Stock Bajo</h3>
+                <span class="dashboard-number" th:text="${stockBajo}">0</span>
+            </div>
+        </button>
+
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-inventario-filtro="agotados">
+            <div class="dashboard-icon">0</div>
+            <div class="dashboard-info">
+                <h3>Agotados</h3>
+                <span class="dashboard-number"
+                      th:text="${productosAgotados != null ? productosAgotados : 0}">
+                    0
+                </span>
+            </div>
+        </button>
+
+    </div>
+    <!-- FILTROS -->
+    <form method="get" th:action="@{/admin/productos}" class="inventario-filtros">
+
+        <input type="text"
+               name="buscar"
+               placeholder="Buscar por nombre de producto..."
+               class="input-busqueda"
+               th:value="${buscar}">
+
+        <select name="categoria"
+                class="input-busqueda"
+                onchange="this.form.submit()">
+
+            <option value="">Todas las categorías</option>
+
+            <option th:each="c : ${categorias}"
+                    th:value="${c.idCategoria}"
+                    th:text="${c.nombre}"
+                    th:selected="${categoriaSeleccionada == c.idCategoria}">
+            </option>
+
+        </select>
+
+        <button type="submit" class="btn-principal">
+            🔍 Buscar
+        </button>
+
+    </form>
+
+    <!-- TABLA INVENTARIO -->
+    <div class="tabla-contenedor">
+
+        <table class="tabla-reportes tabla-inventario">
+
+            <thead>
+            <tr>
+                <th>Imagen</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Compra</th>
+                <th>Venta</th>
+                <th>Stock</th>
+                <th>Oferta</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr th:if="${#lists.isEmpty(productos)}">
+                <td colspan="9" class="tabla-vacia">
+                    No se encontraron productos registrados.
+                </td>
+            </tr>
+
+            <tr th:each="p : ${productos}" class="fila-producto" th:attr="data-stock=${p.stockActual != null ? p.stockActual : 0},data-stock-minimo=${p.stockMinimo != null ? p.stockMinimo : 0},data-estado=${p.estado}">
+
+                <td>
+                    <img class="producto-miniatura"
+                         th:src="${p.imagenUrl != null && p.imagenUrl != '' ? p.imagenUrl : '/img/productos/default.png'}"
+                         th:alt="${p.nombre}">
+                </td>
+
+                <td>
+                    <strong th:text="${p.nombre}"></strong>
+                    <br>
+                    <small>
+                        Código:
+                        <span th:text="${p.codigoBarras != null && p.codigoBarras != '' ? p.codigoBarras : 'Sin código'}"></span>
+                    </small>
+                    <br>
+                    <small th:if="${p.descripcion != null}" th:text="${p.descripcion}"></small>
+                </td>
+
+                <td>
+                    <span class="badge-categoria"
+                          th:text="${p.categoria != null ? p.categoria.nombre : 'Sin categoría'}">
+                    </span>
+                </td>
+
+                <td>
+                    S/
+                    <span th:text="${p.precioCompra != null ? p.precioCompra : '0.00'}"></span>
+                </td>
+
+                <td>
+                    S/
+                    <span th:text="${p.precioVenta != null ? p.precioVenta : '0.00'}"></span>
+                </td>
+
+                <td>
+                    <span th:if="${p.stockActual == null or p.stockActual == 0}"
+                          class="stock-pill stock-agotado-pill"
+                          th:text="${p.stockActual != null ? p.stockActual : 0}">
+                    </span>
+
+                    <span th:if="${p.stockActual != null and p.stockActual > 0 and p.stockMinimo != null and p.stockActual <= p.stockMinimo}"
+                          class="stock-pill stock-bajo-pill"
+                          th:text="${p.stockActual}">
+                    </span>
+
+                    <span th:if="${p.stockActual != null and p.stockActual > 0 and (p.stockMinimo == null or p.stockActual > p.stockMinimo)}"
+                          class="stock-pill stock-ok-pill"
+                          th:text="${p.stockActual}">
+                    </span>
+                </td>
+
+                <td>
+                    <span th:if="${p.descuento != null and p.descuento > 0}"
+                          class="badge-descuento">
+                        -
+                        <span th:text="${p.descuentoRedondeado}"></span>%
+                    </span>
+
+                    <span th:if="${p.descuento == null or p.descuento == 0}"
+                          class="texto-muted">
+                        Sin oferta
+                    </span>
+                </td>
+
+                <td>
+                    <span th:if="${p.estado == 1}" class="badge-activo">
+                        ACTIVO
+                    </span>
+
+                    <span th:if="${p.estado == 0}" class="badge-inactivo">
+                        INACTIVO
+                    </span>
+                </td>
+
+                <td class="acciones-tabla">
+
+                    <button type="button"
+                            class="btn-oferta"
+                            th:attr="
+                                data-id=${p.idProducto},
+                                data-nombre=${p.nombre},
+                                data-descuento=${p.descuento != null ? p.descuento : 0},
+                                data-precio=${p.precioVenta != null ? p.precioVenta : 0}"
+                            onclick="abrirModalOferta(this)">
+                        ⚡
+                    </button>
+
+                    <button type="button"
+                            class="btn-editar"
+                            th:attr="
+                                data-id=${p.idProducto},
+                                data-nombre=${p.nombre},
+                                data-codigo=${p.codigoBarras},
+                                data-categoria=${p.categoria != null ? p.categoria.idCategoria : ''},
+                                data-descripcion=${p.descripcion},
+                                data-imagen=${p.imagenUrl},
+                                data-preciocompra=${p.precioCompra},
+                                data-precioventa=${p.precioVenta},
+                                data-stock=${p.stockActual},
+                                data-stockminimo=${p.stockMinimo},
+                                data-vencimiento=${p.fechaVencimiento},
+                                data-descuento=${p.descuento != null ? p.descuento : 0},
+                                data-estado=${p.estado}"
+                            onclick="abrirModalEditarProducto(this)">
+                        ✏️ Editar
+                    </button>
+
+                    <button type="button"
+                            class="btn-eliminar-producto"
+                            th:attr="
+                                data-id=${p.idProducto},
+                                data-nombre=${p.nombre}"
+                            onclick="abrirModalEliminar(this)">
+                        🗑 Eliminar
+                    </button>
+
+                </td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- MODAL PRODUCTO -->
+<div id="modalProducto" class="modal-overlay">
+
+    <div class="modal-producto">
+
+        <div class="modal-header modal-header-verde">
+            <h2 id="tituloModalProducto">📦 Registrar Nuevo Producto</h2>
+
+            <button type="button"
+                    class="modal-close"
+                    onclick="cerrarModalProducto()">
+                ×
+            </button>
+        </div>
+
+        <form id="formProducto"
+              th:action="@{/admin/productos/guardar}"
+              method="post"
+              class="modal-body">
+
+            <input type="hidden" id="idProducto" name="idProducto">
+
+            <div class="form-section">
+
+                <h3>Información General</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>Nombre del Producto *</label>
+                        <input type="text"
+                               id="nombre"
+                               name="nombre"
+                               maxlength="255"
+                               required
+                               placeholder="Ej: Gaseosa 3L">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Código de Barras</label>
+                        <input type="text"
+                               id="codigoBarras"
+                               name="codigoBarras"
+                               maxlength="50"
+                               placeholder="Ej: 7751234567890">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Categoría *</label>
+                        <select id="idCategoria"
+                                name="idCategoria"
+                                required>
+
+                            <option value="">Seleccione una categoría...</option>
+
+                            <option th:each="c : ${categorias}"
+                                    th:value="${c.idCategoria}"
+                                    th:text="${c.nombre}">
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Imagen URL</label>
+                        <input type="text"
+                               id="imagenUrl"
+                               name="imagenUrl"
+                               maxlength="255"
+                               placeholder="/img/productos/producto.jpg o https://...">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="descripcion"
+                              name="descripcion"
+                              rows="3"
+                              maxlength="255"
+                              placeholder="Descripción breve del producto"></textarea>
+                </div>
+
+            </div>
+
+            <div class="form-section">
+
+                <h3>Información Comercial</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>Precio Compra</label>
+                        <input type="number"
+                               id="precioCompra"
+                               name="precioCompra"
+                               step="0.01"
+                               min="0"
+                               placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Precio Venta *</label>
+                        <input type="number"
+                               id="precioVenta"
+                               name="precioVenta"
+                               step="0.01"
+                               min="0.01"
+                               required
+                               placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Stock Actual *</label>
+                        <input type="number"
+                               id="stockActual"
+                               name="stockActual"
+                               min="0"
+                               required
+                               placeholder="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Stock Mínimo</label>
+                        <input type="number"
+                               id="stockMinimo"
+                               name="stockMinimo"
+                               min="0"
+                               placeholder="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fecha de Vencimiento</label>
+                        <input type="date"
+                               id="fechaVencimiento"
+                               name="fechaVencimiento">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="estado" name="estado">
+                            <option value="1">ACTIVO</option>
+                            <option value="0">INACTIVO</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-actions">
+                <button type="button"
+                        class="btn-secundario"
+                        onclick="cerrarModalProducto()">
+                    Cancelar
+                </button>
+
+                <button type="submit"
+                        class="btn-principal">
+                    💾 Guardar Producto
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- MODAL OFERTA -->
+<div id="modalOferta" class="modal-overlay">
+
+    <div class="modal-oferta">
+
+        <div class="modal-header modal-header-celeste">
+            <h2 id="tituloModalOferta">⚡ Oferta</h2>
+
+            <button type="button"
+                    class="modal-close"
+                    onclick="cerrarModalOferta()">
+                ×
+            </button>
+        </div>
+
+        <form th:action="@{/admin/productos/oferta}"
+              method="post"
+              class="modal-body">
+
+            <input type="hidden" id="ofertaIdProducto" name="idProducto">
+
+            <div class="form-group">
+                <label>Precio Venta</label>
+                <input type="text"
+                       id="ofertaPrecioVenta"
+                       readonly>
+            </div>
+
+            <div class="form-group">
+                <label>Porcentaje Descuento (%)</label>
+                <input type="number"
+                       id="ofertaDescuento"
+                       name="descuento"
+                       min="0"
+                       max="100"
+                       step="0.01"
+                       required>
+            </div>
+
+            <small class="texto-muted">
+                Establecer en 0 para eliminar la oferta.
+            </small>
+
+            <div class="modal-actions">
+                <button type="button"
+                        class="btn-secundario"
+                        onclick="cerrarModalOferta()">
+                    Cancelar
+                </button>
+
+                <button type="submit"
+                        class="btn-principal">
+                    💾 Guardar Oferta
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- MODAL ELIMINAR -->
+<div id="modalEliminar" class="modal-overlay">
+
+    <div class="modal-eliminar">
+
+        <div class="modal-header modal-header-rojo">
+            <h2>🗑 Desactivar Producto</h2>
+
+            <button type="button"
+                    class="modal-close"
+                    onclick="cerrarModalEliminar()">
+                ×
+            </button>
+        </div>
+
+        <form th:action="@{/admin/productos/eliminar}"
+              method="post"
+              class="modal-body">
+
+            <input type="hidden" id="eliminarIdProducto" name="idProducto">
+
+            <p>
+                ¿Deseas desactivar el producto
+                <strong id="eliminarNombreProducto"></strong>?
+            </p>
+
+            <small class="texto-muted">
+                El producto no será eliminado físicamente, solo quedará inactivo.
+            </small>
+
+            <div class="modal-actions">
+                <button type="button"
+                        class="btn-secundario"
+                        onclick="cerrarModalEliminar()">
+                    Cancelar
+                </button>
+
+                <button type="submit"
+                        class="btn-peligro">
+                    🗑 Desactivar
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script th:src="@{/js/producto.js}"></script>
+
+</body>
+</html>

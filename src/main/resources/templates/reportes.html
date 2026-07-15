@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes</title>
+    <link rel="stylesheet"
+          href="/css/style.css?v=sprint4-reportes"
+          th:href="@{/css/style.css(v='sprint4-reportes')}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/admin_header :: adminHeader('Reportes')}"></div>
+
+<div class="container">
+
+    <div class="reportes-encabezado">
+        <div>
+            <h2 class="titulo-seccion">Dashboard de Reportes</h2>
+            <p>Consulta ventas, pedidos, inventario y desempeño de productos.</p>
+        </div>
+    </div>
+
+    <form id="formReportes" action="/admin/reportes" method="get" class="reportes-filtros">
+        <div class="campo-filtro">
+            <label for="desde">Desde</label>
+            <input id="desde" type="date" name="desde" th:value="${desde}">
+        </div>
+
+        <div class="campo-filtro">
+            <label for="hasta">Hasta</label>
+            <input id="hasta" type="date" name="hasta" th:value="${hasta}">
+        </div>
+
+        <div class="campo-filtro">
+            <label for="origen">Origen</label>
+            <select id="origen" name="origen">
+                <option value="">Todos</option>
+                <option value="POS" th:selected="${origen == 'POS'}">POS</option>
+                <option value="WEB" th:selected="${origen == 'WEB'}">WEB</option>
+            </select>
+        </div>
+
+        <div class="campo-filtro">
+            <label for="estado">Estado</label>
+            <select id="estado" name="estado">
+                <option value="">Todos</option>
+                <option value="REGISTRADA" th:selected="${estado == 'REGISTRADA'}">Registrada</option>
+                <option value="ANULADA" th:selected="${estado == 'ANULADA'}">Anulada</option>
+            </select>
+        </div>
+
+        <div class="acciones-filtro">
+            <button type="submit" class="btn btn-principal">Filtrar</button>
+            <a href="/admin/reportes" class="btn btn-secundario">Limpiar</a>
+        </div>
+    </form>
+
+    <div class="dashboard-grid reportes-grid">
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-reporte-accion="tabla">
+            <div class="dashboard-icon">S/</div>
+            <div class="dashboard-info">
+                <h3>Ventas del periodo</h3>
+                <span class="dashboard-number">S/ <span th:text="${ventasFiltradas}"></span></span>
+            </div>
+        </button>
+
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-reporte-accion="tabla">
+            <div class="dashboard-icon">#</div>
+            <div class="dashboard-info">
+                <h3>Comprobantes</h3>
+                <span class="dashboard-number" th:text="${cantidadVentasFiltradas}"></span>
+            </div>
+        </button>
+
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-reporte-origen="POS">
+            <div class="dashboard-icon">POS</div>
+            <div class="dashboard-info">
+                <h3>Ventas POS</h3>
+                <span class="dashboard-number">S/ <span th:text="${ventasPos}"></span></span>
+            </div>
+        </button>
+
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-reporte-origen="WEB">
+            <div class="dashboard-icon">WEB</div>
+            <div class="dashboard-info">
+                <h3>Ventas Web</h3>
+                <span class="dashboard-number">S/ <span th:text="${ventasWeb}"></span></span>
+            </div>
+        </button>
+
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-reporte-rango="hoy">
+            <div class="dashboard-icon">Hoy</div>
+            <div class="dashboard-info">
+                <h3>Ventas Hoy</h3>
+                <span class="dashboard-number">S/ <span th:text="${ventasHoy}"></span></span>
+            </div>
+        </button>
+
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-reporte-rango="mes">
+            <div class="dashboard-icon">Mes</div>
+            <div class="dashboard-info">
+                <h3>Ventas del Mes</h3>
+                <span class="dashboard-number">S/ <span th:text="${ventasMes}"></span></span>
+            </div>
+        </button>
+
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-reporte-accion="inventario">
+            <div class="dashboard-icon">Inv</div>
+            <div class="dashboard-info">
+                <h3>Inventario activo</h3>
+                <span class="dashboard-number" th:text="${productosActivos}"></span>
+            </div>
+        </button>
+
+        <button type="button" class="dashboard-card dashboard-card-clickable" data-reporte-accion="pedidos">
+            <div class="dashboard-icon">Ped</div>
+            <div class="dashboard-info">
+                <h3>Pedidos Pendientes</h3>
+                <span class="dashboard-number" th:text="${pedidosPendientesConteo}"></span>
+            </div>
+        </button>
+    </div>
+
+    <div class="reportes-paneles">
+        <section id="panelProductos" class="reporte-panel">
+            <h3>Productos más vendidos</h3>
+            <div th:if="${#lists.isEmpty(productosMasVendidos)}" class="reporte-vacio">
+                Sin ventas registradas.
+            </div>
+            <div th:each="p : ${productosMasVendidos}" class="reporte-lista-item">
+                <span th:text="${p.nombre}">Producto</span>
+                <strong><span th:text="${p.cantidad}">0</span> und.</strong>
+            </div>
+        </section>
+
+        <section id="panelPedidos" class="reporte-panel">
+            <h3>Pedidos</h3>
+            <div class="reporte-lista-item">
+                <span>Pendientes</span>
+                <strong th:text="${pedidosPendientesConteo}">0</strong>
+            </div>
+            <div class="reporte-lista-item">
+                <span>Entregados hoy</span>
+                <strong th:text="${pedidosAtendidosConteo}">0</strong>
+            </div>
+            <div class="reporte-lista-item alerta">
+                <span>Total pendiente</span>
+                <strong>S/ <span th:text="${pedidosPendientesTotal}">0.00</span></strong>
+            </div>
+        </section>
+
+        <section id="panelStock" class="reporte-panel">
+            <h3>Stock bajo</h3>
+            <div th:if="${#lists.isEmpty(productosStockBajo)}" class="reporte-vacio">
+                Sin productos en alerta.
+            </div>
+            <div th:each="p : ${productosStockBajo}" class="reporte-lista-item alerta">
+                <span th:text="${p.nombre}">Producto</span>
+                <strong><span th:text="${p.stockActual}">0</span> und.</strong>
+            </div>
+        </section>
+
+        <section id="panelOfertas" class="reporte-panel">
+            <h3>Ofertas activas</h3>
+            <div th:if="${#lists.isEmpty(productosOferta)}" class="reporte-vacio">
+                Sin ofertas activas.
+            </div>
+            <div th:each="p : ${productosOferta}" class="reporte-lista-item oferta">
+                <span th:text="${p.nombre}">Producto</span>
+                <strong>-<span th:text="${p.descuentoRedondeado}">0</span>%</strong>
+            </div>
+        </section>
+    </div>
+
+    <h2 id="tablaPedidosPendientes" class="titulo-seccion">Pedidos pendientes por atender</h2>
+
+    <table class="tabla-reportes">
+        <thead>
+            <tr>
+                <th>Pedido</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+                <th>Total</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr th:if="${#lists.isEmpty(pedidosPorAtender)}">
+                <td colspan="7" class="tabla-vacia">No hay pedidos pendientes por atender.</td>
+            </tr>
+
+            <tr th:each="p : ${pedidosPorAtender}">
+                <td>#<span th:text="${p.idPedido}"></span></td>
+                <td th:text="${#temporals.format(p.fechaPedido,'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${p.nombreContacto}">Cliente</td>
+                <td th:text="${p.telefonoContacto}">Teléfono</td>
+                <td>
+                    <span class="estado-chip" th:text="${p.estado}"></span>
+                </td>
+                <td>S/ <span th:text="${p.total}">0.00</span></td>
+                <td>
+                    <a th:href="@{/admin/pedidos/{id}(id=${p.idPedido})}" class="btn-ver">
+                        Atender
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2 class="titulo-seccion">Últimas 20 ventas registradas</h2>
+
+    <table id="tablaVentasReportes" class="tabla-reportes">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Serie</th>
+                <th>Origen</th>
+                <th>Estado</th>
+                <th>Total</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr th:if="${#lists.isEmpty(ultimasVentas)}">
+                <td colspan="6" class="tabla-vacia">No hay ventas para los filtros seleccionados.</td>
+            </tr>
+
+            <tr th:each="v : ${ultimasVentas}">
+                <td th:text="${#temporals.format(v.fechaEmision,'dd/MM/yyyy HH:mm')}"></td>
+                <td>
+                    <span th:text="${v.serie}"></span>-<span th:text="${#numbers.formatInteger(v.correlativo,6)}"></span>
+                </td>
+                <td th:text="${v.origen}"></td>
+                <td>
+                    <span class="estado-chip" th:text="${v.estado}"></span>
+                </td>
+                <td>S/ <span th:text="${v.total}"></span></td>
+                <td>
+                    <a th:href="@{/admin/ventas/ticket/{id}(id=${v.idVenta})}" class="btn-ver">
+                        Ver
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+document.querySelectorAll("[data-reporte-origen]").forEach(function(card){
+    card.addEventListener("click", function(){
+        document.getElementById("origen").value = this.dataset.reporteOrigen;
+        document.getElementById("formReportes").submit();
+    });
+});
+
+document.querySelectorAll("[data-reporte-rango]").forEach(function(card){
+    card.addEventListener("click", function(){
+        const hoy = new Date();
+        const yyyy = hoy.getFullYear();
+        const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+        const dd = String(hoy.getDate()).padStart(2, "0");
+
+        if(this.dataset.reporteRango === "hoy"){
+            document.getElementById("desde").value = `${yyyy}-${mm}-${dd}`;
+            document.getElementById("hasta").value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        if(this.dataset.reporteRango === "mes"){
+            document.getElementById("desde").value = `${yyyy}-${mm}-01`;
+            document.getElementById("hasta").value = `${yyyy}-${mm}-${dd}`;
+        }
+
+        document.getElementById("formReportes").submit();
+    });
+});
+
+document.querySelectorAll("[data-reporte-accion]").forEach(function(card){
+    card.addEventListener("click", function(){
+        const accion = this.dataset.reporteAccion;
+        const destinos = {
+            tabla: "tablaVentasReportes",
+            pedidos: "tablaPedidosPendientes",
+            inventario: "panelStock"
+        };
+        const destino = document.getElementById(destinos[accion]);
+
+        if(destino){
+            destino.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    });
+});
+</script>
+
+</body>
+
+</html>
