@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Reportes</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <h1>📊 Reportes</h1>
+
+</div>
+
+<div class="container">
+
+    <h2 class="titulo-seccion">📊 Dashboard de Reportes</h2>
+
+    <div class="dashboard-grid">
+
+        <!-- Ventas Hoy -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-icon">💰</div>
+
+            <div class="dashboard-info">
+
+                <h3>Ventas Hoy</h3>
+
+                <span class="dashboard-number">
+                    S/
+                    <span th:text="${ventasHoy}"></span>
+                </span>
+
+            </div>
+
+        </div>
+
+        <!-- Ventas Mes -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-icon">📈</div>
+
+            <div class="dashboard-info">
+
+                <h3>Ventas del Mes</h3>
+
+                <span class="dashboard-number">
+                    S/
+                    <span th:text="${ventasMes}"></span>
+                </span>
+
+            </div>
+
+        </div>
+
+        <!-- Productos -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-icon">📦</div>
+
+            <div class="dashboard-info">
+
+                <h3>Productos</h3>
+
+                <span class="dashboard-number"
+                      th:text="${productos}">
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-card">
+
+        <div class="dashboard-icon">🧾</div>
+
+        <div class="dashboard-info">
+
+            <h3>Ventas Registradas</h3>
+
+            <span class="dashboard-number"
+                th:text="${cantidadVentas}">
+            </span>
+
+        </div>
+
+    </div>
+
+        <!-- Pedidos -->
+        <div class="dashboard-card">
+
+            <div class="dashboard-icon">🛒</div>
+
+            <div class="dashboard-info">
+
+                <h3>Pedidos Registrados</h3>
+
+                <span class="dashboard-number"
+                      th:text="${pedidosPendientes}">
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+    <h2 class="titulo-seccion">
+    🧾 Últimas Ventas
+    </h2>
+
+
+    <div class="filtros-reportes">
+
+    <a href="/admin/reportes"
+       class="btn-categoria">
+
+        Todas
+
+    </a>
+
+    <a href="/admin/reportes?hoy=true"
+       class="btn-categoria">
+
+        Hoy
+
+    </a>
+
+    <a href="/admin/reportes?mes=true"
+       class="btn-categoria">
+
+        Este Mes
+
+    </a>
+
+</div>
+
+    <table class="tabla-reportes">
+
+        <thead>
+
+            <tr>
+
+                <th>Fecha</th>
+
+                <th>Serie</th>
+
+                <th>Origen</th>
+
+                <th>Total</th>
+
+                <th>Acción</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <tr th:each="v : ${ultimasVentas}">
+
+                <td th:text="${#temporals.format(v.fechaEmision,'dd/MM/yyyy HH:mm')}"></td>
+
+                <td>
+                    <span th:text="${v.serie}"></span> -
+                    <span th:text="${#numbers.formatInteger(v.correlativo,6)}"></span>
+                </td>
+
+                <td th:text="${v.origen}"></td>
+
+                <td>
+                    S/
+                    <span th:text="${v.total}"></span>
+                </td>
+
+                <td>
+
+                    <a th:href="@{/admin/ventas/ticket/{id}(id=${v.idVenta})}"
+                    class="btn-ver">
+
+                        👁 Ver
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+
+</html>

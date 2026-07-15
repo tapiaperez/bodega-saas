@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Punto de Venta</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<div class="header">
+    <h1>💰 Punto de Venta</h1>
+
+    <div class="nav">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/admin/pedidos">Pedidos</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <h2 class="titulo-seccion">Nueva Venta POS</h2>
+    <div th:if="${success}" class="alert-success">
+    <span th:text="${success}"></span>
+    </div>
+
+    <div th:if="${error}" class="alert-error">
+        <span th:text="${error}"></span>
+    </div>
+
+    <div class="pos-layout">
+
+        <!-- PRODUCTOS -->
+        <div class="pos-productos">
+
+            <h3>🔎 Buscar producto</h3>
+
+            <input type="text"
+                   id="buscarProducto"
+                   class="input-busqueda"
+                   placeholder="Buscar por nombre del producto...">
+
+            <div class="pos-lista-productos">
+
+                <div class="pos-producto"
+                     th:each="p : ${productos}"
+                     th:attr="data-nombre=${p.nombre}">
+
+                    <div class="pos-producto-info">
+
+                        <strong th:text="${p.nombre}"></strong>
+
+                        <div class="pos-detalle">
+                            S/ <span th:text="${p.precioVenta}"></span>
+                            |
+                            Stock:
+                            <span th:text="${p.stockActual}"></span>
+                        </div>
+
+                    </div>
+
+                    <form action="/admin/ventas/agregar"
+                          method="post"
+                          class="pos-form-agregar">
+
+                        <input type="hidden"
+                               name="idProducto"
+                               th:value="${p.idProducto}">
+
+                        <input type="number"
+                               name="cantidad"
+                               value="1"
+                               min="1"
+                               th:attr="max=${p.stockActual}"
+                               class="pos-cantidad">
+
+                        <button th:if="${p.stockActual > 0}"
+                                class="btn-agregar">
+                            ➕
+                        </button>
+
+                        <button th:if="${p.stockActual == 0}"
+                                class="btn-agotado"
+                                disabled>
+                            Agotado
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- VENTA ACTUAL -->
+        <div class="pos-venta">
+
+            <h3>🛒 Venta Actual</h3>
+
+            <div th:if="${#lists.isEmpty(venta)}"
+                 class="venta-vacia">
+                No hay productos agregados.
+            </div>
+
+            <div th:if="${not #lists.isEmpty(venta)}">
+
+            <div class="venta-item"
+                th:each="item : ${venta}">
+
+                <div class="venta-info">
+
+                    <strong th:text="${item.nombre}"></strong>
+
+                    <div>
+
+                        <span th:text="${item.cantidad}"></span>
+
+                        x S/
+
+                        <span th:text="${item.precio}"></span>
+
+                    </div>
+
+                </div>
+
+                <div class="venta-acciones">
+
+                    <div class="venta-subtotal">
+
+                        S/
+                        <span th:text="${item.subtotal}"></span>
+
+                    </div>
+
+                    <form action="/admin/ventas/eliminar"
+                        method="post">
+
+                        <input type="hidden"
+                            name="idProducto"
+                            th:value="${item.idProducto}">
+
+                        <button class="btn-eliminar">
+
+                            ✖
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+                <div class="total-pos">
+                    TOTAL:
+                    S/ <span th:text="${total}"></span>
+                </div>
+
+                <form action="/admin/ventas/registrar"
+                    method="post"
+                    onsubmit="deshabilitarBoton(this)">
+
+                    <button id="btnRegistrarVenta"
+                            class="btn btn-principal">
+
+                        💾 Registrar Venta
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.getElementById("buscarProducto").addEventListener("input", function () {
+
+    const texto = this.value.toLowerCase();
+
+    document.querySelectorAll(".pos-producto").forEach(function (producto) {
+
+        const nombre = producto.getAttribute("data-nombre").toLowerCase();
+
+        if (nombre.includes(texto)) {
+            producto.style.display = "flex";
+        } else {
+            producto.style.display = "none";
+        }
+
+    });
+
+});
+</script>
+
+<script>
+
+function deshabilitarBoton(form){
+
+    const boton =
+        document.getElementById("btnRegistrarVenta");
+
+    boton.disabled = true;
+
+    boton.innerHTML = "⏳ Registrando...";
+
+    return true;
+
+}
+
+</script>
+
+
+
+
+</script>
+
+</body>
+</html>

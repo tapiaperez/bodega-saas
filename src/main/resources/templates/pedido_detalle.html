@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Detalle Pedido</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+
+    <div th:if="${success}" class="alert alert-success">
+    <span th:text="${success}"></span>
+</div>
+
+<div th:if="${error}" class="alert alert-danger">
+    <span th:text="${error}"></span>
+</div>
+
+<div class="container">
+
+    <!-- TITULO -->
+
+    <h2 class="titulo-pedido">
+
+        Pedido #<span th:text="${pedido.idPedido}"></span>
+
+        <span class="badge-pendiente"
+              th:if="${pedido.estado=='PENDIENTE'}">
+            PENDIENTE
+        </span>
+
+        <span class="badge-confirmado"
+              th:if="${pedido.estado=='CONFIRMADO'}">
+            CONFIRMADO
+        </span>
+
+        <span class="badge-preparacion"
+              th:if="${pedido.estado=='EN_PREPARACION'}">
+            EN PREPARACIÓN
+        </span>
+
+        <span class="badge-camino"
+              th:if="${pedido.estado=='EN_CAMINO'}">
+            EN CAMINO
+        </span>
+
+        <span class="badge-entregado"
+              th:if="${pedido.estado=='ENTREGADO'}">
+            ENTREGADO
+        </span>
+
+    </h2>
+
+    <!-- TARJETAS -->
+
+    <div class="pedido-grid">
+
+        <!-- DATOS ENTREGA -->
+
+        <div class="card-entrega">
+
+            <div class="card-header-verde">
+                📋 DATOS DE ENTREGA
+            </div>
+
+            <div class="card-body">
+
+                <p>
+                    <strong>Fecha:</strong>
+                    <span th:text="${#temporals.format(pedido.fechaPedido,'dd/MM/yyyy HH:mm')}"></span>
+                </p>
+
+                <p>
+                    <strong>Cliente:</strong>
+                    <span th:text="${pedido.nombreContacto}"></span>
+                </p>
+
+                <p>
+                    <strong>Teléfono:</strong>
+                    <span th:text="${pedido.telefonoContacto}"></span>
+                </p>
+
+                <p>
+                    <strong>Dirección:</strong>
+                    <span th:text="${pedido.direccionEnvio}"></span>
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- PRODUCTOS -->
+
+        <div class="card-productos">
+
+            <div class="card-header-azul">
+                📦 PRODUCTOS A EMPACAR
+            </div>
+
+            <div class="card-body">
+
+                <table class="tabla">
+
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cant.</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="item : ${items}">
+
+                            <td th:text="${nombresProductos.get(d.idProducto)}"></td>
+
+                            <td th:text="${d.cantidad}"></td>
+
+                            <td>
+                                S/
+                                <span th:text="${d.subtotal}"></span>
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+                <div class="total-cobrar">
+
+                    TOTAL: S/
+                    <span th:text="${pedido.total}"></span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- BOTON SEGUN ESTADO -->
+
+    <div class="acciones-pedido">
+
+        <!-- PENDIENTE -->
+
+        <form th:if="${pedido.estado == 'PENDIENTE'}"
+              action="/admin/pedidos/cambiarEstado"
+              method="post">
+
+            <input type="hidden"
+                   name="idPedido"
+                   th:value="${pedido.idPedido}">
+
+            <input type="hidden"
+                   name="nuevoEstado"
+                   value="CONFIRMADO">
+
+            <button class="btn btn-principal">
+                ✅ Confirmar Pedido
+            </button>
+
+        </form>
+
+        <!-- CONFIRMADO -->
+
+        <form th:if="${pedido.estado == 'CONFIRMADO'}"
+              action="/admin/pedidos/cambiarEstado"
+              method="post">
+
+            <input type="hidden"
+                   name="idPedido"
+                   th:value="${pedido.idPedido}">
+
+            <input type="hidden"
+                   name="nuevoEstado"
+                   value="EN_PREPARACION">
+
+            <button class="btn btn-principal">
+                📦 Iniciar Preparación
+            </button>
+
+        </form>
+
+        <!-- EN_PREPARACION -->
+
+        <form th:if="${pedido.estado == 'EN_PREPARACION'}"
+              action="/admin/pedidos/cambiarEstado"
+              method="post">
+
+            <input type="hidden"
+                   name="idPedido"
+                   th:value="${pedido.idPedido}">
+
+            <input type="hidden"
+                   name="nuevoEstado"
+                   value="EN_CAMINO">
+
+            <button class="btn btn-principal">
+                🚚 Marcar como Despacho
+            </button>
+
+        </form>
+
+        <!-- EN_CAMINO -->
+
+        <form th:if="${pedido.estado == 'EN_CAMINO'}"
+              action="/admin/pedidos/cambiarEstado"
+              method="post">
+
+            <input type="hidden"
+                   name="idPedido"
+                   th:value="${pedido.idPedido}">
+
+            <input type="hidden"
+                   name="nuevoEstado"
+                   value="ENTREGADO">
+
+            <button class="btn btn-principal">
+                🎯 Marcar Entregado
+            </button>
+
+        </form>
+
+        <!-- ENTREGADO -->
+
+        <div th:if="${pedido.estado == 'ENTREGADO'}"
+            class="acciones-pedido">
+
+            <a href="/admin/pedidos"
+            class="btn btn-principal">
+
+                📦 Volver a Bandeja
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <a href="/admin/pedidos"
+       class="btn">
+        Volver
+    </a>
+
+</div>
+
+</body>
+</html>
